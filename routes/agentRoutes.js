@@ -9,7 +9,7 @@ router
     .get(authController.protect, agentController.getAllAgents)
 
 router
-    .post('/signup', authController.signUp)
+    .post('/signup', authController.protect, authController.restricTo('admin'), authController.signUp)
     .post('/login', authController.login)
     .post('/logout', authController.logout)
 

@@ -6,8 +6,10 @@ const router = express.Router();
 
 router
     .route('/intervention')
-    .get(authController.protect, interventionController.getAllInterventions)
-    .post(authController.protect, interventionController.createIntervention)
+    .get(authController.protect, authController.restricTo('admin'), interventionController.getAllInterventions)
+
+router
+    .post('/updatedateTimeDepart', authController.protect, authController.restricTo('chef'), appelController.updatedateTimeDepart)
 
 
 

@@ -79,13 +79,14 @@ exports.login = catchAsync(async (req, res, next) => {
 
 
 exports.signUp = catchAsync(async (req, res, next) => {
-    const newAgent = await Agent.create({
+    await Agent.create({
         nom: req.body.nom,
         prenom: req.body.prenom,
         date_de_naissance: req.body.date_de_naissance,
         email: req.body.email,
         password: req.body.password,
-        passwordConfirm: req.body.passwordConfirm
+        passwordConfirm: req.body.passwordConfirm,
+        role: req.body.role
     });
 
     res.status(200).json({
@@ -135,3 +136,14 @@ exports.protect = catchAsync(async (req, res, next) => {
 
     next();
 });
+
+exports.restricTo = (...roles) => {
+    return (req, res, next) => {
+        if (!roles.includes(req.user.role)) {
+            return next(
+                new AppError("Vous n'avez pas la permission", 403)
+            )
+        }
+        next();
+    }
+}

@@ -2,62 +2,57 @@ const mongoose = require("mongoose");
 const dateTime = require("../utils/moment").dateTime;
 
 const interventionSchema = new mongoose.Schema({
-    created_at: {
-        type: Date,
-        default: dateTime
+    numTel: {
+        type: String,
+        required: [true, "Vous devez saisir un numéro"]
+    },
+    gps_coordonnee: {
+        latitude: {
+            type: Number,
+            required: [true, "Vous devez saisir le latitude"]
+        },
+        longitude: {
+            type: Number,
+            required: [true, "Vous devez saisir la longitude"]
+        },
+    },
+    cco_agent: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Agent'
     },
     agents: [{
         type: mongoose.Schema.ObjectId,
         ref: 'Agent'
     }],
-    unite_secondaire:[{ // une intervention pourrait provenir d'une ou de plusieurs unités dans le cas de renfort
-        type:mongoose.Schema.ObjectId,
-        ref:"Unite_secondaire"
+    unite_secondaire: [{ // une intervention pourrait provenir d'une ou de plusieurs unités dans le cas de renfort
+        type: mongoose.Schema.ObjectId,
+        ref: "Unite_secondaire"
     }],
-    date_sortie: {
-        type:Date,
-        default:dateTime,
-
+    // dateTimeAppel == l'heure de l'appel entrant
+    dateTimeAppel: {
+        type: Date,
+        default: dateTime
     },
-    date_entree: {
-        type:Date,
-        
+    // dateTimeAppelDepart == l'heure du départ de la véhicule
+    dateTimeAppelDepart: {
+        type: Date,
     },
-    description_initial:{
-        type:String,
-        //required:[true,"Une description intial de l'intervention est obligatoire"],
+    // dateTimeAppelArrive == l'heure d'arrivé à l'accident
+    dateTimeAppelArrive: {
+        type: Date,
     },
-    
-
-
-
-
-
-
-
-
-
-    message: [{
-        body: {
-            type: String,
-            required: [true, "An agent must send a message"],
-            minlength: [1, "A message must have more or equal then 1 characters"],
-            maxlength: [100, "A message must have less or equal then 100 characters"],
-        },
-        created_at: {
-            type: Date,
-            default: dateTime
-        },
-        status: {
-            type: String,
-            default: "envoye",
-            enum: ["envoye", "recu", "vu"]
-        },
-        sender: {
-            type: mongoose.Schema.ObjectId,
-            ref: 'Agent'
-        }
-    }],
+    // dateTimeAppelFin == l'heure de la fin des traitement , sois ki youwasslou l'hopital sois ki ykamlou traitement nta3houm
+    dateTimeAppelFin: {
+        type: Date,
+    },
+    // description_automatique == les choix de CCO comme accident ou un feu
+    description_automatique: {
+        type: String,
+    },
+    // description_initial == la description de chef d'agrés
+    description_initial: {
+        type: String,
+    },
 });
 
 
