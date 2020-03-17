@@ -10,10 +10,37 @@ const interventionSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'Agent'
     }],
+    unite_secondaire:[{ // une intervention pourrait provenir d'une ou de plusieurs unités dans le cas de renfort
+        type:mongoose.Schema.ObjectId,
+        ref:"Unite_secondaire"
+    }],
+    date_sortie: {
+        type:Date,
+        default:dateTime,
+
+    },
+    date_entree: {
+        type:Date,
+        
+    },
+    description_initial:{
+        type:String,
+        //required:[true,"Une description intial de l'intervention est obligatoire"],
+    },
+    
+
+
+
+
+
+
+
+
+
     message: [{
         body: {
             type: String,
-            required: [true, "A agent must send a message"],
+            required: [true, "An agent must send a message"],
             minlength: [1, "A message must have more or equal then 1 characters"],
             maxlength: [100, "A message must have less or equal then 100 characters"],
         },
