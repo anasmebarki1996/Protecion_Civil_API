@@ -9,7 +9,7 @@ router
     .get(authController.protect, authController.restricTo('admin'), interventionController.getAllInterventions)
 
 router
-    .post('/updatedateTimeDepart', authController.protect, authController.restricTo('chef'), appelController.updatedateTimeDepart)
+    .post('/addDateTimeDepart', authController.protect, authController.restricTo('chef'), appelController.addDateTimeDepart)
 
 
 

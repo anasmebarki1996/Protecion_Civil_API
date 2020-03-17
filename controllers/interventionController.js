@@ -12,7 +12,7 @@ exports.getAllInterventions = catchAsync(async (req, res) => {
     })
 });
 
-exports.updatedateTimeDepart = catchAsync(async (req, res) => {
+exports.addDateTimeDepart = catchAsync(async (req, res) => {
     Intervention.updateOne({
         "chef": req.user._id
     }, {
@@ -24,4 +24,3 @@ exports.updatedateTimeDepart = catchAsync(async (req, res) => {
         status: "success"
     });
 });
-
