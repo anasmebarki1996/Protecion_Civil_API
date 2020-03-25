@@ -1,8 +1,5 @@
 const mongoose = require("mongoose");
 const dateTime = require("../utils/moment").dateTime;
-const date = require("../utils/moment").date;
-
-console.log(dateTime)
 
 const interventionSchema = new mongoose.Schema({
     numTel: {
@@ -33,20 +30,20 @@ const interventionSchema = new mongoose.Schema({
     }],
     // dateTimeAppel == l'heure de l'appel entrant
     dateTimeAppel: {
-        type: String,
+        type: Date,
         default: dateTime
     },
     // dateTimeDepart == l'heure du départ de la véhicule
     dateTimeDepart: {
-        type: String,
+        type: Date,
     },
     // dateTimeArrive == l'heure d'arrivé à l'accident
     dateTimeArrive: {
-        type: String,
+        type: Date,
     },
     // dateTimeFin == l'heure de la fin des traitement , sois ki youwasslou l'hopital sois ki ykamlou traitement nta3houm
     dateTimeFin: {
-        type: String,
+        type: Date,
     },
     // description_automatique == les choix de CCO comme accident ou un feu
     description_automatique: {

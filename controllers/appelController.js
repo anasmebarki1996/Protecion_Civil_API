@@ -3,17 +3,19 @@ const Intervention = require("../models/interventionModel");
 const catchAsync = require('../utils/catchAsync');
 
 exports.nouveauAppel = catchAsync(async (req, res) => {
+    console.log(req.body)
 
-    await Appel.create({
+    const appel = await Appel.create({
         numTel: req.body.numTel,
         gps_coordonnee: {
-            latitude: req.body.latitude,
-            longitude: req.body.longitude
+            latitude: req.body.gps_coordonnee.latitude,
+            longitude: req.body.gps_coordonnee.longitude
         },
     });
 
     res.status(200).json({
-        status: "success"
+        status: "success",
+        appel
     });
 });
 
@@ -28,6 +30,8 @@ exports.getAppel = catchAsync(async (req, res) => {
         numTel: req.body.numTel,
     });
     if (appel) {
+
+        console.log(appel)
         await Intervention.create({
             numTel: appel.numTel,
             gps_coordonnee: {

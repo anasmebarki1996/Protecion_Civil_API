@@ -17,7 +17,7 @@ const appelSchema = new mongoose.Schema({
         },
     },
     dateTimeAppel: {
-        type: String,
+        type: Date,
         default: dateTime
     },
 });

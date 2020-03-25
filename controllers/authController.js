@@ -17,44 +17,31 @@ const signToken = id => {
     );
 };
 
-exports.signUp = catchAsync(async (req, res, next) => {
-    const newAgent = await Agent.create({
-        nom: req.body.nom,
-        prenom: req.body.prenom,
-        date_de_naissance: req.body.date_de_naissance,
-        email: req.body.email,
-        password: req.body.password,
-        passwordConfirm: req.body.passwordConfirm
-    });
 
-    res.status(200).json({
-        status: "success"
-    });
-});
 
 exports.login = catchAsync(async (req, res, next) => {
     const {
-        email,
+        username,
         password
     } = req.body;
 
-    // 1) check if email and password exist
-    if (!email || !password) {
-        return next(new AppError("Please provide email and password!", 400));
+    // 1) check if username and password exist
+    if (!username || !password) {
+        return next(new AppError("Please provide username and password!", 400));
     }
 
     // 2) check if agent exists && password is correct
     const agent = await Agent.findOne({
-        email: email
+        username: username
     }).select("+password");
 
     if (!agent) {
-        return next(new AppError("Incorrect email and password!", 401));
+        return next(new AppError("Incorrect username and password!", 401));
     }
 
     const checkPassword = await agent.checkPassword(password, agent.password);
     if (!checkPassword) {
-        return next(new AppError("Incorrect email and password!", 401));
+        return next(new AppError("Incorrect username and password!", 401));
     }
 
     // 3) if everything ok , send token to client
@@ -78,21 +65,6 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 
-exports.signUp = catchAsync(async (req, res, next) => {
-    await Agent.create({
-        nom: req.body.nom,
-        prenom: req.body.prenom,
-        date_de_naissance: req.body.date_de_naissance,
-        email: req.body.email,
-        password: req.body.password,
-        passwordConfirm: req.body.passwordConfirm,
-        role: req.body.role
-    });
-
-    res.status(200).json({
-        status: "success"
-    });
-});
 
 exports.logout = catchAsync(async (req, res, next) => {
     res.clearCookie("messenger_jwt");
@@ -130,7 +102,6 @@ exports.protect = catchAsync(async (req, res, next) => {
             new AppError("Agent recently changed password! Please log in again.", 401)
         );
     }
-
     // Grant access to protected route
     req.agent = currentAgent;
 
@@ -139,7 +110,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
 exports.restricTo = (...roles) => {
     return (req, res, next) => {
-        if (!roles.includes(req.user.role)) {
+        if (!roles.includes(req.agent.role)) {
             return next(
                 new AppError("Vous n'avez pas la permission", 403)
             )

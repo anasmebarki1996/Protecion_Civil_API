@@ -6,10 +6,10 @@ const router = express.Router();
 
 router
     .route('/')
-    .get(authController.protect, agentController.getAllAgents)
+    .get(agentController.getAllAgents)
 
 router
-    .post('/signup', authController.protect, authController.restricTo('admin'), authController.signUp)
+    .post('/createAgent', authController.protect, authController.restricTo('admin'), agentController.createAgent)
     .post('/login', authController.login)
     .post('/logout', authController.logout)
 
