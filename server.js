@@ -22,11 +22,11 @@ app.use("/API", limiter);
 // set security HTTP headers
 app.use(helmet());
 
-process.on("uncaughtException", err => {
-  console.log(err.name, err.message);
-  console.log("UNHADLED REJECTION! Shuting down ...");
-  process.exit(0);
-});
+// process.on("uncaughtException", err => {
+//   console.log(err.name, err.message);
+//   console.log("UNHADLED REJECTION! Shuting down ...");
+//   process.exit(0);
+// });
 
 dotenv.config({
   path: "./config.env"

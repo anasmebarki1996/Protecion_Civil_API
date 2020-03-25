@@ -31,8 +31,8 @@ exports.getAppel = catchAsync(async (req, res) => {
         await Intervention.create({
             numTel: appel.numTel,
             gps_coordonnee: {
-                latitude: appel.latitude,
-                longitude: appel.longitude
+                latitude: appel.gps_coordonnee.latitude,
+                longitude: appel.gps_coordonnee.longitude
             },
             dateTimeAppel: appel.dateTimeAppel,
             cco_agent: req.agent._id
@@ -46,9 +46,17 @@ exports.getAppel = catchAsync(async (req, res) => {
         res.status(200).json({
             status: "success"
         });
+
     } else
         res.status(200).json({
             status: "error",
         });
+
+});
+
+console.log("addDateTimeDepart à faire")
+
+exports.addDateTimeDepart = catchAsync(async (req, res) => {
+
 
 });

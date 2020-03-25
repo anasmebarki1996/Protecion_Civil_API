@@ -5,7 +5,6 @@ const Unite_secondaireSchema = new mongoose.Schema({
     nom: {
         type:Date,
         default:dateTime,
-
     },
     willaya:{
         type:String,
@@ -27,7 +26,6 @@ const Unite_secondaireSchema = new mongoose.Schema({
         type:mongoose.Schema.ObjectId,
         ref: 'Agent'
     },
-
     gps_coordonnee: {
         latitude:{
             type:Number,

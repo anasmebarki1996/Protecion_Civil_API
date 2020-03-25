@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const dateTime = require("./../utils/moment").dateTime;
 
 const appelSchema = new mongoose.Schema({
     numTel: {
@@ -16,7 +17,7 @@ const appelSchema = new mongoose.Schema({
         },
     },
     dateTimeAppel: {
-        type: Date,
+        type: String,
         default: dateTime
     },
 });
