@@ -53,6 +53,7 @@ const interventionSchema = new mongoose.Schema({
     description_initial: {
         type: String,
     },
+
 });
 
 
