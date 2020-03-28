@@ -3,6 +3,7 @@ const Intervention = require("../models/interventionModel");
 const catchAsync = require('../utils/catchAsync');
 
 exports.nouveauAppel = catchAsync(async (req, res) => {
+
     console.log(req.body)
 
     const appel = await Appel.create({
@@ -31,7 +32,6 @@ exports.getAppel = catchAsync(async (req, res) => {
     });
     if (appel) {
 
-        console.log(appel)
         await Intervention.create({
             numTel: appel.numTel,
             gps_coordonnee: {
@@ -54,6 +54,7 @@ exports.getAppel = catchAsync(async (req, res) => {
     } else
         res.status(200).json({
             status: "error",
+            message: "Numero inexistant , Veulliez introduire un nouveau numero"
         });
 
 });

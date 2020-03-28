@@ -5,21 +5,36 @@ class APIFeatures {
             this.queryString = queryString;
     }
 
+    search() {
+        if (this.queryString.search) {
+            console.log("#### in search ###")
+            var queryArray = [];
+            for (var property in this.query.schema.paths) {
+                if (this.query.schema.paths.hasOwnProperty(property) && this.query.schema.paths[property]["instance"] === "String") {
+                    queryArray.push(JSON.parse('{\"' + property + '\": {\"$regex\":\"' + this.queryString.search + '\",\"$options\": \"i\"}}'))
+                }
+            }
+            console.log(queryArray)
+            var queryStr = {
+                $or: queryArray
+            };
+            this.query = this.query.find(queryStr);
+        }
+        return this;
+    }
+
     filter() {
         //1A) Filtring
         const queryObj = {
             ...this.queryString
         };
-        const execludedFields = ['page', 'sort', 'limit', 'fields']
+        const execludedFields = ['page', 'sort', 'limit', 'fields', 'search']
         execludedFields.forEach(el => delete queryObj[el])
-
         // 1B) Advanced filtring
-
         // \b to match the exact word
         // g to execute multiple time
         let queryStr = JSON.stringify(queryObj);
         queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-
         this.query = this.query.find(JSON.parse(queryStr));
         return this;
     }
@@ -29,7 +44,7 @@ class APIFeatures {
         // link http:// ......?sort=price,age
         // query sort function query.sort(price age)
         if (this.queryString.sort) {
-            const sortBy = req.query.sort.split(',').join(' ');
+            const sortBy = this.queryString.sort.split(',').join(' ');
             this.query = this.query.sort(sortBy)
         } else {
             this.query = this.query.sort('createdAt')
@@ -49,10 +64,13 @@ class APIFeatures {
 
     }
     paginate() {
-        const page = this.queryString.page * 1 | 1;
-        const limit = this.queryString.limit * 1 | 10;
+
+        const page = this.queryString.page ? parseInt(this.queryString.page) : 1;
+        const limit = this.queryString.limit ? parseInt(this.queryString.limit) : 10;
         const skip = (page - 1) * limit;
+
         this.query = this.query.skip(skip).limit(limit);
+
         return this;
 
     }

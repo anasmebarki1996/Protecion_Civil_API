@@ -7,6 +7,7 @@ const router = express.Router();
 
 router
     .post('/getAllIntervention', interventionController.getAllInterventions)
+    // .post('/getIntervention', interventionController.getIntervention)
     .post('/addDateTimeDepart', authController.protect, authController.restricTo('chef'), appelController.addDateTimeDepart)
 
 
