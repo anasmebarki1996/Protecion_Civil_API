@@ -27,7 +27,7 @@ exports.login = catchAsync(async (req, res, next) => {
 
     // 1) check if username and password exist
     if (!username || !password) {
-        return next(new AppError("Please provide username and password!", 400));
+        return next(new AppError("Veuillez-vous introduire votre nom d'utilisateur et votre mot de passe!", 400));
     }
 
     // 2) check if agent exists && password is correct
@@ -36,12 +36,12 @@ exports.login = catchAsync(async (req, res, next) => {
     }).select("+password");
 
     if (!agent) {
-        return next(new AppError("Incorrect username and password!", 401));
+        return next(new AppError("Veuillez-vous vérifier votre nom d'utilisateur et votre mot de passe!", 401));
     }
 
     const checkPassword = await agent.checkPassword(password, agent.password);
     if (!checkPassword) {
-        return next(new AppError("Incorrect username and password!", 401));
+        return next(new AppError("Veuillez-vous vérifier votre nom d'utilisateur et votre mot de passe!", 401));
     }
 
     // 3) if everything ok , send token to client
@@ -52,22 +52,26 @@ exports.login = catchAsync(async (req, res, next) => {
             Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
         ),
         // secure: true, // to work on https
-        httpOnly: true // to prevent that agent modify the cookie in the browser
+        httpOnly: true, // to prevent that agent modify the cookie in the browser,
     };
 
-    if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
-    res.cookie("messenger_jwt", token, cookieOptions);
+    // if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
+    res.cookie("agent_jwt", token, cookieOptions);
 
+    console.log(agent)
     res.status(200).json({
         status: "success",
-        token
+        agent_id: agent._id,
+        agent_nom: agent.nom,
+        agent_role: agent.role,
+        agent_username: agent.username
     });
 });
 
 
 
 exports.logout = catchAsync(async (req, res, next) => {
-    res.clearCookie("messenger_jwt");
+    res.clearCookie("agent_jwt");
     res.status(200).json({
         status: "success"
     });
@@ -77,12 +81,12 @@ exports.protect = catchAsync(async (req, res, next) => {
     let token;
     // 1) Getting token and check of it's there
     if (req.headers.cookie) {
-        token = req.headers.cookie.split("messenger_jwt=")[1];
+        token = req.headers.cookie.split("agent_jwt=")[1];
     }
 
     if (!token) {
         return next(
-            new AppError("You are not logged in! Please log in to get access.", 401)
+            new AppError("Vous n'est pas connecté! Veuillez-vous vous connecter s'il vous plait", 401)
         );
     }
     // 2) Verification token
@@ -92,7 +96,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     const currentAgent = await Agent.findById(decoded.id);
     if (!currentAgent) {
         return next(
-            new AppError("You are no longer logged in ! Please log in again.", 401)
+            new AppError("Vous n'est plus connecté! Veuillez-vous vous connecter s'il vous plait", 401)
         );
     }
 
@@ -118,3 +122,10 @@ exports.restricTo = (...roles) => {
         next();
     }
 }
+
+
+exports.checkToken = catchAsync(async (req, res, next) => {
+    res.status(200).json({
+        status: "success",
+    });
+});

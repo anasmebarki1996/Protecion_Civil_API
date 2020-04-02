@@ -12,8 +12,6 @@ exports.getAllInterventions = catchAsync(async (req, res) => {
     });
     const interventions = await features.query;
 
-    console.log("###################" + interventions_total)
-
     // SEND RESPONSE
     res.status(200).json({
         status: "success",

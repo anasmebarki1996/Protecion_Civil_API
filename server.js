@@ -10,7 +10,6 @@ const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
-const cors = require("cors");
 const limiter = rateLimit({
   // pour maximiser 100 requetes / heure pour le meme @IP
   max: 100,
@@ -18,9 +17,7 @@ const limiter = rateLimit({
   message: "Too many requests from this IP,please try again in an hour !"
 });
 
-app.use(cors());
-
-app.use("/API", limiter);
+// app.use("/API", limiter);
 // set security HTTP headers
 app.use(helmet());
 
@@ -92,7 +89,7 @@ app.use(globalErrorHandler);
 // ###################### FIN Routes ######################
 
 const PORT = process.env.PORT || 30001;
-const server = app.listen(PORT, process.env.LOCALHOST, function() {
+const server = app.listen(PORT, process.env.LOCALHOST, function () {
   console.log("Server is running on : " + process.env.LOCALHOST + ":" + PORT);
 });
 

@@ -7,14 +7,12 @@ class APIFeatures {
 
     search() {
         if (this.queryString.search) {
-            console.log("#### in search ###")
             var queryArray = [];
             for (var property in this.query.schema.paths) {
                 if (this.query.schema.paths.hasOwnProperty(property) && this.query.schema.paths[property]["instance"] === "String") {
                     queryArray.push(JSON.parse('{\"' + property + '\": {\"$regex\":\"' + this.queryString.search + '\",\"$options\": \"i\"}}'))
                 }
             }
-            console.log(queryArray)
             var queryStr = {
                 $or: queryArray
             };

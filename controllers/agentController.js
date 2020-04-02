@@ -14,7 +14,6 @@ exports.getAllAgents = catchAsync(async (req, res) => {
 
 
 exports.createAgent = catchAsync(async (req, res, next) => {
-    console.log(req.body)
     const newAgent = await Agent.create({
         nom: req.body.nom,
         prenom: req.body.prenom,

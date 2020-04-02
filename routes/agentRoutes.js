@@ -9,8 +9,9 @@ router
     .get(agentController.getAllAgents)
 
 router
-    .post('/createAgent', authController.protect, authController.restricTo('admin'), agentController.createAgent)
+    .post('/createAgent', agentController.createAgent)
     .post('/login', authController.login)
     .post('/logout', authController.logout)
+    .post('/checkToken', authController.protect, authController.checkToken)
 
 module.exports = router;

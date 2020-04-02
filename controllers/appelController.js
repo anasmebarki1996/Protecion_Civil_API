@@ -4,7 +4,6 @@ const catchAsync = require('../utils/catchAsync');
 
 exports.nouveauAppel = catchAsync(async (req, res) => {
 
-    console.log(req.body)
 
     const appel = await Appel.create({
         numTel: req.body.numTel,
@@ -34,9 +33,11 @@ exports.getAppel = catchAsync(async (req, res) => {
 
         await Intervention.create({
             numTel: appel.numTel,
-            gps_coordonnee: {
-                latitude: appel.gps_coordonnee.latitude,
-                longitude: appel.gps_coordonnee.longitude
+            adresse: {
+                gps_coordonnee: {
+                    latitude: appel.gps_coordonnee.latitude,
+                    longitude: appel.gps_coordonnee.longitude
+                }
             },
             dateTimeAppel: appel.dateTimeAppel,
             cco_agent: req.agent._id
