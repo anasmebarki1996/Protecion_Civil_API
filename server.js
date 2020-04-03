@@ -76,9 +76,11 @@ app.use(hpp());
 const agentRoutes = require("./routes/agentRoutes");
 const interventionRoutes = require("./routes/interventionRoutes");
 const appelRoutes = require("./routes/appelRoutes");
+const treeRoutes = require("./routes/treeRoutes");
 app.use("/API/", agentRoutes);
 app.use("/API/", interventionRoutes);
 app.use("/API/", appelRoutes);
+app.use("/API/", treeRoutes);
 
 app.all("*", (req, res, next) => {
   next(new appError(`Can't find ${req.originalUrl} on this server`, 404));
