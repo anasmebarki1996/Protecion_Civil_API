@@ -16,7 +16,8 @@ const treeSchema = new mongoose.Schema({
                 decision: {
                     protection: [{
                         type: String,
-                        enum: ["ambulance_medicalise", "ambulance_sanitaire", "FPT", "EPA", "CCFM"]
+                        enum: ["ambulance_medicalise", "ambulance_sanitaire", "FPT", "EPA", "CCFM"],
+                        required: [true, "Vous devez saisir un moyen de protection civil"]
                         // FPT 
                         // CCFM 
                         // EPA : FPT + echelle
