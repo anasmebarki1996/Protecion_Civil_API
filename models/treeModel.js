@@ -13,29 +13,27 @@ const treeSchema = new mongoose.Schema({
                     type: String,
                     required: [true, "Vous devez saisir le type de niveau 2."],
                 },
-                // decision: [{
-                //     protection: [{
-                //         engin: {
-                //             type: String,
-                //             enum: ["ambulance_medicalise", "ambulance_sanitaire", "FPT", "EPA", "CCFM"]
-                //             // FPT 
-                //             // CCFM 
-                //             // EPA : FPT + echelle
-                //         }
-                //     }],
-                //     // securite = police ou gendarme
-                //     securite: {
-                //         type: Boolean,
-                //         default: false,
-                //         require: true
-                //     },
-                //     //
-                //     sante: {
-                //         type: Boolean,
-                //         default: false,
-                //         require: true
-                //     }
-                // }]
+                decision: {
+                    protection: [{
+                        type: String,
+                        enum: ["ambulance_medicalise", "ambulance_sanitaire", "FPT", "EPA", "CCFM"]
+                        // FPT 
+                        // CCFM 
+                        // EPA : FPT + echelle
+                    }],
+                    // securite = police ou gendarme
+                    securite: {
+                        type: Boolean,
+                        default: false,
+                        require: true
+                    },
+                    //
+                    sante: {
+                        type: Boolean,
+                        default: false,
+                        require: true
+                    }
+                }
             }]
         }]
     },

@@ -18,11 +18,11 @@ exports.createTree = catchAsync(async (req, res, next) => {
     const newTree = await Tree.create({
         initial: {
             niv1: {
-                type: req.body.niv1_type,
+                niv1_type: req.body.niv1_type,
                 niv2: [{
                     niv2_type: req.body.niv2_type,
                     decision: [{
-                        protection: req.body.engin,
+                        protection: ["ambulance_medicalise"],
                         securite: req.body.securite,
                         sante: req.body.sante
                     }]
