@@ -6,6 +6,6 @@ const router = express.Router();
 
 router
     .post('/nouveauAppel', appelController.nouveauAppel)
-    .post('/getAppel', authController.protect, authController.restricTo('admin'), appelController.getAppel)
+    .post('/getAppel', authController.protect, authController.restricTo('cco_agent'), appelController.getAppel)
 
 module.exports = router;

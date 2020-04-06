@@ -16,18 +16,16 @@ exports.getAllTree = catchAsync(async (req, res) => {
 exports.createTree = catchAsync(async (req, res, next) => {
     console.log(req.body)
     const newTree = await Tree.create({
-        initial: {
-            niv1: {
-                niv1_type: req.body.niv1_type,
-                niv2: [{
-                    niv2_type: req.body.niv2_type,
-                    decision: {
-                        protection: req.body.engin,
-                        securite: req.body.securite,
-                        sante: req.body.sante
-                    }
-                }]
-            }
+        niv1: {
+            niv1_type: req.body.niv1_type,
+            niv2: [{
+                niv2_type: req.body.niv2_type,
+                decision: {
+                    protection: req.body.engin,
+                    securite: req.body.securite,
+                    sante: req.body.sante
+                }
+            }]
         }
     });
 
