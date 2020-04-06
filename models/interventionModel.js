@@ -31,19 +31,15 @@ const interventionSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Agent"
   },
-  agents: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: "Agent"
-    }
-  ],
-  unite_secondaire: [
-    {
-      // une intervention pourrait provenir d'une ou de plusieurs unités dans le cas de renfort
-      type: mongoose.Schema.ObjectId,
-      ref: "Unite_secondaire"
-    }
-  ],
+  agents: [{
+    type: mongoose.Schema.ObjectId,
+    ref: "Agent"
+  }],
+  unite_secondaire: [{
+    // une intervention pourrait provenir d'une ou de plusieurs unités dans le cas de renfort
+    type: mongoose.Schema.ObjectId,
+    ref: "Unite_secondaire"
+  }],
   // dateTimeAppel == l'heure de l'appel entrant
   dateTimeAppel: {
     type: Date,
@@ -71,8 +67,8 @@ const interventionSchema = new mongoose.Schema({
   },
   statut: {
     type: String,
-    enum: ["en_cours", "termine"],
-    default: "agent"
+    enum: ["entre", "en_cours", "termine"],
+    default: "entre"
   }
 });
 
