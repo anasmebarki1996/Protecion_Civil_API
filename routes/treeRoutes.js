@@ -12,7 +12,8 @@ router
 
 router
     .get('/tree',treeController.displayTree) //returns the graph of all the tree
-    .get('/tree/nodes',treeController.getNodes) //return nodes of a specified parent
+    .get('/tree/nodes/:parent_id?',treeController.getNodes) //return nodes of a specified parent
+    .get('/tree/nodes/path/',treeController.getNodePath) //return nodes of a specified parent
     .post('/tree',treeController.createNode)
     .put('/tree',treeController.updateNode)
     .delete('/tree',treeController.deleteNode)

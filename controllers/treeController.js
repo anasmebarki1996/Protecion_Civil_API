@@ -34,37 +34,72 @@ exports.displayTree = catchAsync(async (req, res , next)=>{
     })
 })
 
+exports.getNodePath = catchAsync(async (req , res )=>{
+
+    /*var child_id = req.params.child_id ||
+    var data = []
+    var test = true
+    var tmp
+
+    res.status(200).json({
+        data:req.params
+    })
+    return
+    
+    while(test){
+        tmp =await Node.findOne({_id:child_id},["parent_id","name"])
+
+        data.push(tmp)
+
+
+        if(tmp == null)
+            break
+        if(tmp.parent_id == null)
+            break
+
+        child_id = tmp.parent_id    
+    }*/
+    res.status(200).json({
+        status:"not implemented yet",
+      
+    })
+})
 
 
 // return nodes of a specified parentNode_id 
 exports.getNodes = catchAsync(async (req, res, next)=>{
     //if parentNode_id is not set in the request then set it to NUll
-    const parent_id = req.body.parent_id || null
+    const parent_id = req.params.parent_id || null
+    
 
     /*
         this instruction will return all the nodes of the tree in which they 
         have the same parentNode_id if it is null then it will return the nodes of the first level
     */
-    const tree_level = await Node.find({parent_id:parent_id});
+    const data = await Node.find({parent_id:parent_id});
 
     res.status(200).json({
         status: "success",
         
-        data:{
-            tree_level
-        }
+        data
     })
 })
 
 
 exports.createNode = catchAsync(async (req, res)=>{
+    
 
     const data = await Node.create({
         name:req.body.name,
         description:req.body.description,
         icon:req.body.icon,
+        decision:{
+            intern:req.body.decision.intern,
+            extern:req.body.decision.extern
+        },
         //if this node has parentNode_id == null then it means it a level 1 node 
         parent_id:req.body.parent_id || null
+
     })
 
     res.status(200).json({
