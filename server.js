@@ -10,6 +10,7 @@ const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
+var cors = require('cors');
 const limiter = rateLimit({
   // pour maximiser 100 requetes / heure pour le meme @IP
   max: 100,
@@ -19,6 +20,7 @@ const limiter = rateLimit({
 
 // app.use("/API", limiter);
 // set security HTTP headers
+app.use(cors());
 app.use(helmet());
 
 // process.on("uncaughtException", err => {
