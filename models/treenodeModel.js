@@ -1,10 +1,8 @@
 const mongoose = require("mongoose");
+const treeValidator = require("./../validators/treeValidator")
 
-const Engin = require("./enginModel")
 
-const intern_decision_validator = async function(v){
-    return (await Engin.distinct("code_name")).includes(v)
-}
+
 
 const nodeSchema = new mongoose.Schema({
     name:{
@@ -37,7 +35,7 @@ const nodeSchema = new mongoose.Schema({
                 type: String,
                 validate: {
                     validator : function(v){
-                        return intern_decision_validator(v)
+                        return treeValidator.intern_decision_validator(v)
                     },
                    
                     message: props => `engin ' ${props.value} ' n'existe pas dans notre base d'engins .`

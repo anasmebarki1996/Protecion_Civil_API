@@ -13,8 +13,9 @@ router
 router
     .get('/tree',treeController.displayTree) //returns the graph of all the tree
     .get('/tree/nodes/:parent_id?',treeController.getNodes) //return nodes of a specified parent
-    .get('/tree/nodes/path/',treeController.getNodePath) //return nodes of a specified parent
+    .get('/tree/path/:child_id?',treeController.getNodePath) //return nodes of a specified parent
     .post('/tree',treeController.createNode)
-    .put('/tree',treeController.updateNode)
+    .put('/tree/:id?',treeController.updateNode)
     .delete('/tree',treeController.deleteNode)
+    .get('/engin',treeController.getAllEngins)
 module.exports = router;
