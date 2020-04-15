@@ -69,6 +69,11 @@ const agentSchema = new mongoose.Schema({
             message: "Les mots de passe ne sont pas identiques"
         }
     },
+    id_unite: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Unite",
+        required: [true, "Vous devez saisir l'unité"],
+    },
     role: {
         type: String,
         enum: ["admin", "cco_agent", "chef", "agent"], // chef = Chef d'agrès

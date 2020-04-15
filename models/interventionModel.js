@@ -13,7 +13,7 @@ const interventionSchema = new mongoose.Schema({
     daira: {
       type: String
     },
-    lieu: {
+    adresse_rue: {
       type: String
     },
     gps_coordonnee: {
@@ -27,6 +27,7 @@ const interventionSchema = new mongoose.Schema({
       }
     }
   },
+  
   cco_agent: {
     type: mongoose.Schema.ObjectId,
     ref: "Agent"
@@ -35,10 +36,10 @@ const interventionSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Agent"
   }],
-  unite_secondaire: [{
+  id_unite: [{
     // une intervention pourrait provenir d'une ou de plusieurs unités dans le cas de renfort
     type: mongoose.Schema.ObjectId,
-    ref: "Unite_secondaire"
+    ref: "Unite"
   }],
   // dateTimeAppel == l'heure de l'appel entrant
   dateTimeAppel: {

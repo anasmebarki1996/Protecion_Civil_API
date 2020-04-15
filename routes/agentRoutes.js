@@ -13,5 +13,6 @@ router
     .post('/login', authController.login)
     .post('/logout', authController.logout)
     .post('/checkToken', authController.protect, authController.checkToken)
+    .post('/searchAgent', authController.protect, agentController.searchAgent)
 
 module.exports = router;

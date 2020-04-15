@@ -29,3 +29,47 @@ exports.createAgent = catchAsync(async (req, res, next) => {
         newAgent
     });
 });
+
+
+exports.searchAgent = catchAsync(async (req, res, next) => {
+
+    console.log("#### il faut ajouter la contrainte type de l'agent");
+    const agents = await Agent.aggregate(
+        [{
+                $match: {
+                    id_unite: req.agent.id_unite,
+                    // $or: [{
+                    //     nom: {
+                    //         $regex: req.body.input,
+                    //         $options: 'i'
+                    //     },
+                    //     prenom: {
+                    //         $regex: req.body.input,
+                    //         $options: 'i'
+                    //     },
+                    //     username: {
+                    //         $regex: req.body.input,
+                    //         $options: 'i'
+                    //     },
+                    // }]
+                }
+            },
+            {
+                $project: {
+                    result: {
+                        $concat: ["$nom", " ", "$prenom", " ---", "$username"]
+                    }
+                }
+            }
+        ]
+    )
+
+    console.log(agents)
+
+
+
+    res.status(200).json({
+        status: "success",
+        agents
+    });
+});

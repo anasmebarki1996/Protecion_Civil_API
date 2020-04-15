@@ -57,9 +57,9 @@ exports.login = catchAsync(async (req, res, next) => {
 
     // if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
     res.cookie("agent_jwt", token, cookieOptions);
-    
 
-        console.log(agent)
+
+    console.log(agent)
     res.status(200).json({
         status: "success",
         agent_id: agent._id,
@@ -109,6 +109,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     }
     // Grant access to protected route
     req.agent = currentAgent;
+    console.log(req.agent)
 
     next();
 });
