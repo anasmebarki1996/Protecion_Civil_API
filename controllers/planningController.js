@@ -45,6 +45,7 @@ exports.addDate = catchAsync(async (req, res, next) => {
 });
 
 exports.addTeam = catchAsync(async (req, res, next) => {
+    console.log(req.body)
     let agent;
     for (let i = 0; i < req.body.agents.length; i++) {
         agent = await Agent.find({

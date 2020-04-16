@@ -1,13 +1,18 @@
 const Agent = require("../models/agentModel");
 const catchAsync = require('../utils/catchAsync');
+const APIFeatures = require('../utils/apiFeatures')
 
 exports.getAllAgents = catchAsync(async (req, res) => {
-    const agents = await Agent.find();
+    const features = new APIFeatures(Agent.find({
+        id_unite: req.agent.id_unite
+    }), req.query).search().paginate().sort();
+    const agents = await features.query;
+
+    console.log(agents)
     res.status(200).json({
         status: "success",
-        data: {
-            agents
-        }
+        agents,
+        agents_total: agents.length
     })
 });
 
@@ -21,7 +26,8 @@ exports.createAgent = catchAsync(async (req, res, next) => {
         username: req.body.username,
         password: req.body.password,
         passwordConfirm: req.body.passwordConfirm,
-        role: req.body.role
+        role: req.body.role,
+        numTel: req.body.numTel
     });
 
     res.status(200).json({

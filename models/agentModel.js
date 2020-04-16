@@ -44,6 +44,13 @@ const agentSchema = new mongoose.Schema({
             message: "le nom d'utilisateur ne peut avoir que les caractères a-z,A-Z,0-9."
         }
     },
+    numTel: {
+        type: String,
+        unique: [
+            true,
+            "Ce numéro est déja utilisé. Vouliez saisir un nouveau!"
+        ],
+    },
     // .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/, "i");
     password: {
         type: String,

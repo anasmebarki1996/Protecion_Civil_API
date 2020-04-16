@@ -1,17 +1,10 @@
 const mongoose = require("mongoose");
 
 const enginSchema = new mongoose.Schema({
-
-    type: {
+    code_name: {
         type: String,
-        //enum: ["ambulance sanitaire", "ambulance medicalise", "FPT"],
-        required: [true, "Vous devez saisir le type d'engin"],
-        
-    },
-    code_name:{
-        type:String,
         enum: ["ambulance_sanitaire", "ambulance_medicalise", "FPT"],
-        required:[true, " vous devez specifier le code name d'engin."]
+        required: [true, " vous devez specifier le code name d'engin."]
     },
     matricule: {
         type: String,

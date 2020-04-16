@@ -1,9 +1,10 @@
 const Engin = require("../models/enginModel");
 const catchAsync = require('../utils/catchAsync');
+const APIFeatures = require('../utils/apiFeatures')
 
 exports.createEngin = catchAsync(async (req, res, next) => {
     const engin = await Engin.create({
-        type: req.body.type,
+        code_name: req.body.code_name,
         matricule: req.body.matricule,
         id_unite: req.agent.id_unite,
         username: "anasmebarki1996"
@@ -15,9 +16,40 @@ exports.createEngin = catchAsync(async (req, res, next) => {
     });
 });
 
+
+exports.changeStatutPanne = catchAsync(async (req, res, next) => {
+    await Engin.findOneAndUpdate({
+        _id: req.body.id_engin,
+        id_unite: req.agent.id_unite
+    }, {
+        $set: {
+            panne: !req.body.panne
+        }
+    })
+    res.status(200).json({
+        status: "success",
+    });
+});
+
+
+
+exports.getListEngin = catchAsync(async (req, res, next) => {
+    const features = new APIFeatures(Engin.find({
+        id_unite: req.agent.id_unite
+    }), req.query).search().paginate().sort();
+    const engins = await features.query;
+
+    res.status(200).json({
+        status: "success",
+        engins,
+        engins_total: engins.length
+    });
+});
+
 exports.updatePanne = catchAsync(async (req, res, next) => {
     await Engin.findByIdAndUpdate({
         _id: req.body.id_engin,
+        id_unite: req.agent.id_unite
     }, {
         $set: {
             panne: req.body.nouveauStatutPanne
@@ -33,9 +65,10 @@ exports.updatePanne = catchAsync(async (req, res, next) => {
 exports.updateEngin = catchAsync(async (req, res, next) => {
     await Engin.findByIdAndUpdate({
         _id: req.body.id_engin,
+        id_unite: req.agent.id_unite
     }, {
         $set: {
-            type: req.body.type,
+            code_name: req.body.code_name,
             matricule: req.body.matricule,
             id_unite: req.agent.id_unite,
         }
@@ -45,6 +78,18 @@ exports.updateEngin = catchAsync(async (req, res, next) => {
         status: "success",
     });
 });
+
+exports.deleteEngin = catchAsync(async (req, res, next) => {
+    await Engin.deleteOne({
+        _id: req.body.id_engin,
+        id_unite: req.agent.id_unite
+    });
+
+    res.status(200).json({
+        status: "success",
+    });
+});
+
 
 exports.searchEngin = catchAsync(async (req, res, next) => {
     const engins = await Engin.aggregate(
@@ -57,7 +102,7 @@ exports.searchEngin = catchAsync(async (req, res, next) => {
             {
                 $project: {
                     result: {
-                        $concat: ["$matricule", " ---", "$type"]
+                        $concat: ["$matricule", " ---", "$code_name"]
                     }
                 }
             }

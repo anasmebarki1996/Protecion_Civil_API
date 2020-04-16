@@ -109,8 +109,6 @@ exports.protect = catchAsync(async (req, res, next) => {
     }
     // Grant access to protected route
     req.agent = currentAgent;
-    console.log(req.agent)
-
     next();
 });
 

@@ -6,19 +6,16 @@ const APIFeatures = require('../utils/apiFeatures')
 exports.getAllInterventions = catchAsync(async (req, res) => {
     // // EXECUTE QUERY
 
-    const features = new APIFeatures(Intervention.find(), req.query).search().paginate().sort();
-    const interventions_total = await Intervention.find().countDocuments(function (err, count) {
-        return count;
-    });
+    const features = new APIFeatures(Intervention.find({
+        id_unite: req.agent.id_unite
+    }), req.query).search().paginate().sort();
     const interventions = await features.query;
 
     // SEND RESPONSE
     res.status(200).json({
         status: "success",
-        data: {
-            interventions,
-            interventions_total
-        }
+        interventions,
+        interventions_total: interventions.length
     })
 
 });
