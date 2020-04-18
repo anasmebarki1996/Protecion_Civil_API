@@ -92,6 +92,7 @@ exports.deleteEngin = catchAsync(async (req, res, next) => {
 
 
 exports.searchEngin = catchAsync(async (req, res, next) => {
+    console.log("search engin : on doit verifier si les engins sont deja pris pour ce jour")
     const engins = await Engin.aggregate(
         [{
                 $match: {
@@ -102,7 +103,7 @@ exports.searchEngin = catchAsync(async (req, res, next) => {
             {
                 $project: {
                     result: {
-                        $concat: ["$matricule", " ---", "$code_name"]
+                        $concat: ["$code_name", " ---", "$matricule"]
                     }
                 }
             }

@@ -75,6 +75,7 @@ app.use(xss());
 app.use(hpp());
 
 // ###################### Routes ######################
+const authRoutes = require("./routes/authRoutes");
 const agentRoutes = require("./routes/agentRoutes");
 const interventionRoutes = require("./routes/interventionRoutes");
 const appelRoutes = require("./routes/appelRoutes");
@@ -82,6 +83,7 @@ const treeRoutes = require("./routes/treeRoutes");
 const planningRoutes = require("./routes/planningRoutes");
 const uniteRoutes = require("./routes/uniteRoutes");
 const enginRoutes = require("./routes/enginRoutes");
+app.use("/API/", authRoutes);
 app.use("/API/", agentRoutes);
 app.use("/API/", interventionRoutes);
 app.use("/API/", appelRoutes);

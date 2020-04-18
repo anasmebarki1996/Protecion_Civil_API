@@ -6,11 +6,12 @@ const router = express.Router();
 
 
 router
-    .post('/createAgent', agentController.createAgent)
-    .post('/login', authController.login)
-    .post('/logout', authController.logout)
-    .post('/checkToken', authController.protect, authController.checkToken)
+    .post('/createAgent', authController.protect, agentController.createAgent)
+    .post('/getAgent', authController.protect, agentController.getAgent)
     .post('/searchAgent', authController.protect, agentController.searchAgent)
     .post('/getAllAgents', authController.protect, agentController.getAllAgents)
+    .post('/updatePersonnelAgent', authController.protect, agentController.updatePersonnelAgent)
+    .post('/updateCompteAgent', authController.protect, agentController.updateCompteAgent)
+    .post('/updatePasswordAgent', authController.protect, agentController.updatePasswordAgent)
 
 module.exports = router;

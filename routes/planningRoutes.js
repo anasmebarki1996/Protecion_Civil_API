@@ -5,7 +5,9 @@ const router = express.Router();
 
 
 router
-    .post('/createPlanning', planningController.createPlanning)
+    .post('/createPlanning', authController.protect, planningController.createPlanning)
+    .post('/addTeam', authController.protect, planningController.addTeam)
+    .post('/getTeams', authController.protect, planningController.getTeams)
 
 
 module.exports = router;

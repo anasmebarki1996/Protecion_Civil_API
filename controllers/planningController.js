@@ -1,6 +1,10 @@
 const Planning = require("../models/planningModel");
+const Agent = require("../models/agentModel");
+const Engin = require("../models/enginModel");
 const catchAsync = require("../utils/catchAsync");
-const appError = require("./../utils/appError");
+const AppError = require("./../utils/appError");
+const APIFeatures = require("./../utils/apiFeatures");
+const moment = require("./../utils/moment").moment;
 const {
     Types: {
         ObjectId
@@ -9,7 +13,7 @@ const {
 
 exports.createPlanning = catchAsync(async (req, res, next) => {
     await Planning.create({
-        id_unite: req.body.id_unite,
+        id_unite: req.agent.id_unite,
         calendrier: [],
     });
 
@@ -21,7 +25,7 @@ exports.createPlanning = catchAsync(async (req, res, next) => {
 
 exports.addDate = catchAsync(async (req, res, next) => {
     await Planning.findOneAndUpdate({
-            id_unite: req.body.id_unite,
+            id_unite: req.agent.id_unite,
         }, {
             $push: {
                 calendrier: {
@@ -44,66 +48,105 @@ exports.addDate = catchAsync(async (req, res, next) => {
     });
 });
 
-exports.addTeam = catchAsync(async (req, res, next) => {
+exports.getTeams = catchAsync(async (req, res, next) => {
+
     console.log(req.body)
+    const features = new APIFeatures(Planning.findOne({
+        id_unite: req.agent.id_unite,
+        "calendrier.date": req.body.date,
+    }, {
+        "_id": 0,
+        "calendrier.$": 1
+    }), req.query);
+    const teams = await features.query;
+
+
+    console.log(teams)
+    res.status(200).json({
+        status: "success",
+        teams: teams.calendrier[0],
+        teams_total: teams.length
+    })
+});
+
+
+exports.addTeam = catchAsync(async (req, res, next) => {
     let agent;
     for (let i = 0; i < req.body.agents.length; i++) {
-        agent = await Agent.find({
-            username: req.body.agents[0].agent
+        agent = await Agent.findOne({
+            username: req.body.agents[i].agent.split("---")[1],
         });
-        if (agent && ["chaffeur", "chef", "secours"].includes(req.body.agents[i].type)) {
+        if (
+            agent && ["chauffeur", "chef", "secours"].includes(req.body.agents[i].type)
+        ) {
             req.body.agents[i].agent = agent._id;
         } else {
             return next(
                 new AppError("Veuilliez vous vérifier la liste des agents", 403)
-            )
+            );
         }
     }
-    let engin = await Engin.find({
-        matricule: req.body.engin
+
+    let engin = await Engin.findOne({
+        matricule: req.body.engin.split("---")[1],
     });
+
     if (!engin) {
         return next(
             new AppError("Veuilliez vous vérifier le matricule d'engin", 403)
-        )
+        );
     }
-    const planning = await Planning.findOneAndUpdate({
+
+    // verifier si la date entrée est une nouvelle date si oui on ajoute la nouvelle date 
+    // sinon on ajoute directement a la date entrée qui est existe déja
+    let dateVerify = await Planning.findOne({
+        id_unite: req.agent.id_unite,
+        "calendrier.date": req.body.date,
+    });
+
+    if (!dateVerify) {
+        dateVerify = await Planning.findOneAndUpdate({
             id_unite: req.agent.id_unite,
-            calendrier: {
-                date: req.body.date,
-            },
         }, {
             $push: {
-                "calendrier.$[a].team": {
-                    agents: req.body.agents, // list des agents
-                    engin: req.body.engin,
+                calendrier: {
+                    date: req.body.date,
                 },
             },
         }, {
             new: true,
-            arrayFilters: [{
-                "a._id": ObjectId(req.body.calendrier_id),
-            }, ],
+        });
+    }
+    let calendrier_id = dateVerify.calendrier.filter((x) =>
+        moment(x.date).format('YYYY-MM-DD') === moment(req.body.date).format('YYYY-MM-DD')
+    )[0]._id;
+
+    await Planning.updateOne({
+        id_unite: req.agent.id_unite,
+        "calendrier.date": req.body.date,
+    }, {
+        $push: {
+            "calendrier.$[a].team": {
+                agents: req.body.agents, // list des agents
+                engin: engin._id,
+            },
         },
-        (err, doc) => {
-            if (err) {
-                console.log("Something wrong when updating data!");
-            }
-            console.log(doc);
-        }
-    );
+    }, {
+        arrayFilters: [{
+            "a._id": ObjectId(calendrier_id),
+        }, ],
+    });
+
+
     res.status(200).json({
         status: "success",
-        planning
     });
 });
 
 exports.addAgent = catchAsync(async (req, res, next) => {
     await Planning.findOneAndUpdate({
             id_unite: req.body.id_unite,
-            calendrier: {
-                date: req.body.date,
-            },
+            "calendrier.date": req.body.date,
         }, {
             $push: {
                 "calendrier.$[a].team.$[b].agents": {
@@ -130,99 +173,3 @@ exports.addAgent = catchAsync(async (req, res, next) => {
         status: "success",
     });
 });
-
-// exports.createPlanning = catchAsync(async (req, res, next) => {
-//     let newPlanning;
-//     // const newPlanning = await Planning.create({
-//     //     id_unite: "req.body.id_unitee",
-//     //     calendrier: [{
-//     //         date: "2020-03-26",
-//     //         team: [{
-//     //             agents: [{
-//     //                 agent: "5e7bae2b01b07d2118a6382e",
-//     //                 type: "secours"
-//     //             }],
-//     //             engin: "5e8e2ca5294f4733d0ec71c4"
-//     //         }]
-//     //     }]
-//     // });
-//     // ################################################
-//     // Planning.findOneAndUpdate({
-//     //     id_unite: 'req.body.id_unitee',
-//     // }, {
-//     //     $push: {
-//     //         calendrier: {
-//     //             date: "2020-03-20"
-//     //         }
-//     //     }
-//     // }, {
-//     //     new: true
-//     // }, (err, doc) => {
-//     //     if (err) {
-//     //         console.log("Something wrong when updating data!");
-//     //     }
-
-//     //     console.log(doc);
-//     // });
-//     // ################################################
-
-//     // Planning.findOneAndUpdate({
-//     //     id_unite: 'req.body.id_unitee',
-//     //
-//     // }, {
-//     //     $push: {
-//     //         calendrier: {
-//     //             date: "2020-03-11"
-//     //         }
-//     //     }
-//     // }, {
-//     //     new: true
-//     // }, (err, doc) => {
-//     //     if (err) {
-//     //         console.log("Something wrong when updating data!");
-//     //     }
-
-//     //     console.log(doc);
-//     // });
-//     // Simulating the date values
-
-//     Planning.findOneAndUpdate({
-//             calendrier: {
-//                 $elemMatch: {
-//                     date: "2020-03-26"
-//                 }
-//             }
-//         }, {
-//             $push: {
-//                 "calendrier.0.team.$[a].agents": {
-//                     agent: "5e7bae2b01b07d2118a6382e",
-//                     type: "chef"
-//                 }
-//             }
-//         }, {
-//             new: true,
-//             // But not in here
-//             "arrayFilters": [{
-//                 "a._id": ObjectId("5e90d55e81983813dc50cff1")
-//             }]
-//         },
-//         (err, doc) => {
-//             if (err) {
-//                 console.log("Something wrong when updating data!");
-//             }
-
-//             console.log(doc);
-//         });
-//     // var query = await Planning.find({
-//     //     calendrier: {
-//     //         $elemMatch: {
-//     //             date: "2020-03-26"
-//     //         }
-//     //     }
-//     // });
-
-//     // console.log(query)
-//     res.status(200).json({
-//         status: "success",
-//     });
-// });
