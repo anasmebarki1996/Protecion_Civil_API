@@ -10,12 +10,12 @@ const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
-var cors = require('cors');
+var cors = require("cors");
 const limiter = rateLimit({
   // pour maximiser 100 requetes / heure pour le meme @IP
   max: 100,
   windowMs: 60 * 60 * 1000,
-  message: "Too many requests from this IP,please try again in an hour !"
+  message: "Too many requests from this IP,please try again in an hour !",
 });
 
 // app.use("/API", limiter);
@@ -23,14 +23,14 @@ const limiter = rateLimit({
 app.use(cors());
 app.use(helmet());
 
-process.on("uncaughtException", err => {
+process.on("uncaughtException", (err) => {
   console.log(err.name, err.message);
   console.log("UNHADLED REJECTION! Shuting down ...");
   process.exit(0);
 });
 
 dotenv.config({
-  path: "./config.env"
+  path: "./config.env",
 });
 const mongoose = require("mongoose");
 
@@ -43,7 +43,7 @@ mongoose
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: false,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
   })
   .then(() => {
     console.log("db connecction successful !");
@@ -59,7 +59,7 @@ app.use(express.static("public"));
 //partie bodyParser
 app.use(
   bodyParser.urlencoded({
-    extended: false
+    extended: false,
   })
 );
 app.use(bodyParser.json());
@@ -105,7 +105,7 @@ const server = app.listen(PORT, process.env.LOCALHOST, function () {
   console.log("Server is running on : " + process.env.LOCALHOST + ":" + PORT);
 });
 
-process.on("unhandledRejection", err => {
+process.on("unhandledRejection", (err) => {
   console.log(err.name, err.message);
   console.log("UNHADLED REJECTION! Shuting down ...");
   server.close(() => {
