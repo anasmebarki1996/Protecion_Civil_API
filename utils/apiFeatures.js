@@ -9,6 +9,7 @@ class APIFeatures {
         if (this.queryString.search) {
             var queryArray = [];
             for (var property in this.query.schema.paths) {
+
                 if (this.query.schema.paths.hasOwnProperty(property) && this.query.schema.paths[property]["instance"] === "String") {
                     queryArray.push(JSON.parse('{\"' + property + '\": {\"$regex\":\"' + this.queryString.search + '\",\"$options\": \"i\"}}'))
                 }
