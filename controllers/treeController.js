@@ -98,6 +98,28 @@ exports.getNodes = catchAsync(async (req, res, next)=>{
     })
 })
 
+// return nodes of a specified parentNode_id 
+exports.getNode = catchAsync(async (req, res, next)=>{
+    //if parentNode_id is not set in the request then set it to NUll
+    const id = req.params.id || null
+
+    if(!mongoose.isValidObjectId(id))
+        return next(new AppError("Node Id is Not Valid",400))
+    
+
+    /*
+        this instruction will return all the nodes of the tree in which they 
+        have the same parentNode_id if it is null then it will return the nodes of the first level
+    */
+    const data = await Node.find({_id:id});
+
+    res.status(200).json({
+        status: "success",
+        
+        data
+    })
+})
+
 
 exports.createNode = catchAsync(async (req, res)=>{
     
@@ -187,14 +209,18 @@ exports.updateNode = catchAsync(async (req, res, next) => {
 
 exports.deleteNode = catchAsync(async (req, res,next)=>{
 
+    /*
     if(!req.body._id)
         return next(new AppError("_id is not defined",400))
-        
+    */
 
-    const _id = req.body._id
+    const id = req.params.id || null
 
-    await Node.deleteOne({_id:_id},function(err){
+
+
+    await Node.deleteOne({_id:id},function(err){
         if(err) return next(new AppError(err.message,err.status))
+        
         res.status(200).json({
             status:"success"
         })
@@ -207,7 +233,7 @@ exports.deleteNode = catchAsync(async (req, res,next)=>{
 
 exports.getAllEngins = catchAsync(async (req, res , next)=>{
     
-    const engins = await Engin.aggregate([{$group:{_id:'$code_name',name:{$first:"$type"}}}])
+    const engins = await Engin.aggregate([{$group:{_id:'$name',name:{$first:"$code_name"}}}])
     res.status(200).json({
         status:"success",
         data:engins

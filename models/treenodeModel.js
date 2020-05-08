@@ -33,13 +33,7 @@ const nodeSchema = new mongoose.Schema({
             {
 
                 type: String,
-                validate: {
-                    validator : function(v){
-                        return treeValidator.intern_decision_validator(v)
-                    },
-                   
-                    message: props => `engin ' ${props.value} ' n'existe pas dans notre base d'engins .`
-                },
+                
                 /*required: [
                     true,
                     "Vous devez spécifier l'engin de protection civil",

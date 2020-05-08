@@ -4,6 +4,7 @@ const APIFeatures = require('../utils/apiFeatures')
 
 exports.createEngin = catchAsync(async (req, res, next) => {
     const engin = await Engin.create({
+        name: req.body.name,
         code_name: req.body.code_name,
         matricule: req.body.matricule,
         id_unite: req.agent.id_unite,
@@ -34,6 +35,9 @@ exports.changeStatutPanne = catchAsync(async (req, res, next) => {
 
 
 exports.getListEngin = catchAsync(async (req, res, next) => {
+    const engin_name_list = await Engin.distinct("name")
+    const engin_code_name_list = await Engin.distinct("code_name")
+    
     const features = new APIFeatures(Engin.find({
         id_unite: req.agent.id_unite
     }), req.query).search().paginate().sort();
@@ -42,7 +46,10 @@ exports.getListEngin = catchAsync(async (req, res, next) => {
     res.status(200).json({
         status: "success",
         engins,
-        engins_total: engins.length
+        engins_total: engins.length,
+        
+        engin_name_list:engin_name_list,
+        engin_code_name_list: engin_code_name_list
     });
 });
 
@@ -68,6 +75,7 @@ exports.updateEngin = catchAsync(async (req, res, next) => {
         id_unite: req.agent.id_unite
     }, {
         $set: {
+            name: req.body.name,
             code_name: req.body.code_name,
             matricule: req.body.matricule,
             id_unite: req.agent.id_unite,
@@ -90,6 +98,18 @@ exports.deleteEngin = catchAsync(async (req, res, next) => {
     });
 });
 
+exports.engin_name_list = catchAsync(async (req, res, next) => {
+    const engin_name_list = await Engin.distinct("name")
+    const engin_code_name_list = await Engin.distinct("code_name")
+    
+
+    res.status(200).json({
+        status: "success",
+        engin_name_list:engin_name_list,
+        engin_code_name_list: engin_code_name_list
+    });
+});
+
 
 exports.searchEngin = catchAsync(async (req, res, next) => {
     console.log("search engin : on doit verifier si les engins sont deja pris pour ce jour")
@@ -103,7 +123,7 @@ exports.searchEngin = catchAsync(async (req, res, next) => {
             {
                 $project: {
                     result: {
-                        $concat: ["$code_name", " ---", "$matricule"]
+                        $concat: ["$name","$code_name", " ---", "$matricule"]
                     }
                 }
             }

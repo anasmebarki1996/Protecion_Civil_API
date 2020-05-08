@@ -6,6 +6,7 @@ const router = express.Router();
 router
     .post('/createEngin', authController.protect, enginController.createEngin)
     .post('/getListEngin', authController.protect, enginController.getListEngin)
+    .get('/engin', authController.protect, enginController.getListEngin) //return the list of engins cRud
     .post('/updatePanne', authController.protect, enginController.updatePanne)
     .post('/updateEngin', authController.protect, enginController.updateEngin)
     .post('/searchEngin', authController.protect, enginController.searchEngin)
