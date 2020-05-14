@@ -31,6 +31,20 @@ const planningSchema = new mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Engin",
             },
+            gps_coordonnee: {
+                lat: {
+                    type: Number,
+                    required: [true, "Une Unitée  doit avoir lat "]
+                },
+                lng: {
+                    type: Number,
+                    required: [true, "Une Unitée  doit avoir lng "]
+                },
+            },
+            disponibilite: {
+                type: Boolean,
+                default: true
+            },
         }, ],
     }, ],
 });

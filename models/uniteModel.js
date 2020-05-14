@@ -21,13 +21,13 @@ const UniteSchema = new mongoose.Schema({
             required: [true, "adresse de rue est obligatoired"]
         },
         gps_coordonnee: {
-            latitude: {
+            lat: {
                 type: Number,
-                required: [true, "Une Unitée  doit avoir latitude "]
+                required: [true, "Une Unitée  doit avoir lat "]
             },
-            longitude: {
+            lng: {
                 type: Number,
-                required: [true, "Une Unitée  doit avoir longitude "]
+                required: [true, "Une Unitée  doit avoir lng "]
             },
         },
     },

@@ -5,12 +5,12 @@ const AppError = require('../utils/appError');
 
 exports.nouveauAppel = catchAsync(async (req, res, next) => {
 
-    if (req.body.gps_coordonnee.latitude && req.body.gps_coordonnee.longitude && req.body.numTel) {
+    if (req.body.gps_coordonnee.lat && req.body.gps_coordonnee.lng && req.body.numTel) {
         await Appel.create({
             numTel: req.body.numTel,
             gps_coordonnee: {
-                latitude: req.body.gps_coordonnee.latitude,
-                longitude: req.body.gps_coordonnee.longitude
+                lat: req.body.gps_coordonnee.lat,
+                lng: req.body.gps_coordonnee.lng
             },
         });
 
@@ -33,13 +33,13 @@ exports.getAppel = catchAsync(async (req, res, next) => {
         numTel: req.body.numTel,
     });
     if (appel) {
-
+        console.log(appel)
         await Intervention.create({
             numTel: appel.numTel,
             adresse: {
                 gps_coordonnee: {
-                    latitude: appel.gps_coordonnee.latitude,
-                    longitude: appel.gps_coordonnee.longitude
+                    lat: appel.gps_coordonnee.lat,
+                    lng: appel.gps_coordonnee.lng
                 }
             },
             dateTimeAppel: appel.dateTimeAppel,
@@ -47,9 +47,9 @@ exports.getAppel = catchAsync(async (req, res, next) => {
         });
 
         // sans await parce qu'on s'en fout des données supprimé
-        Appel.deleteOne({
-            numTel: appel.numTel
-        });
+        // Appel.deleteOne({
+        //     numTel: appel.numTel
+        // });
 
         res.status(200).json({
             status: "success",

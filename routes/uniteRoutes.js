@@ -10,5 +10,7 @@ router
     .post('/updateChef_unite', uniteController.updateChef_unite)
     .post('/updateTypeUnite', uniteController.updateTypeUnite)
     .post('/updateInformationUnite', uniteController.updateInformationUnite)
+    .post('/getUnitePlusProche', uniteController.getUnitePlusProche)
+
 
 module.exports = router;

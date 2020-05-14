@@ -7,13 +7,13 @@ const appelSchema = new mongoose.Schema({
         required: [true, "Vous devez saisir un numéro"]
     },
     gps_coordonnee: {
-        latitude: {
+        lat: {
             type: Number,
-            required: [true, "Vous devez saisir le latitude"]
+            required: [true, "Vous devez saisir le lat"]
         },
-        longitude: {
+        lng: {
             type: Number,
-            required: [true, "Vous devez saisir la longitude"]
+            required: [true, "Vous devez saisir la lng"]
         },
     },
     dateTimeAppel: {

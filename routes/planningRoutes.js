@@ -18,6 +18,8 @@ router
     .post('/planning/addSecours', authController.protect, planningController.addSecours)
     .post('/planning/deleteSecours', authController.protect, planningController.deleteSecours)
     .post('/planning/updateDate', authController.protect, planningController.updateDate)
+    .post('/planning/getAdresseTeam', authController.protect, planningController.getAdresseTeam)
+    .post('/planning/getTeamID', authController.protect, planningController.getTeamID)
 
 
 module.exports = router;

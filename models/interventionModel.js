@@ -4,73 +4,74 @@ const dateTime = require("../utils/moment").dateTime;
 const interventionSchema = new mongoose.Schema({
   numTel: {
     type: String,
-    required: [true, "Vous devez saisir un numéro"]
+    required: [true, "Vous devez saisir un numéro"],
   },
   adresse: {
     wilaya: {
-      type: String
+      type: String,
     },
     daira: {
-      type: String
+      type: String,
     },
     adresse_rue: {
-      type: String
+      type: String,
     },
     gps_coordonnee: {
-      latitude: {
+      lat: {
         type: Number,
-        required: [true, "Vous devez saisir le latitude"]
+        required: [true, "Vous devez saisir le lat"],
       },
-      longitude: {
+      lng: {
         type: Number,
-        required: [true, "Vous devez saisir la longitude"]
-      }
-    }
+        required: [true, "Vous devez saisir la lng"],
+      },
+    },
   },
-  
   cco_agent: {
     type: mongoose.Schema.ObjectId,
-    ref: "Agent"
+    ref: "Agent",
   },
-  agents: [{
+  id_team: {
     type: mongoose.Schema.ObjectId,
-    ref: "Agent"
-  }],
-  id_unite: [{
-    // une intervention pourrait provenir d'une ou de plusieurs unités dans le cas de renfort
-    type: mongoose.Schema.ObjectId,
-    ref: "Unite"
-  }],
+  },
+  id_unite: [
+    {
+      // une intervention pourrait provenir d'une ou de plusieurs unités dans le cas de renfort
+      type: mongoose.Schema.ObjectId,
+      ref: "Unite",
+    },
+  ],
+
   // dateTimeAppel == l'heure de l'appel entrant
   dateTimeAppel: {
     type: Date,
-    default: dateTime
+    default: dateTime,
   },
   // dateTimeDepart == l'heure du départ de la véhicule
   dateTimeDepart: {
-    type: Date
+    type: Date,
   },
   // dateTimeArrive == l'heure d'arrivé à l'accident
   dateTimeArrive: {
-    type: Date
+    type: Date,
   },
   // dateTimeFin == l'heure de la fin des traitement , sois ki youwasslou l'hopital sois ki ykamlou traitement nta3houm
   dateTimeFin: {
-    type: Date
+    type: Date,
   },
   // description_automatique == les choix de CCO comme accident ou un feu
   description_automatique: {
-    type: String
+    type: String,
   },
   // description_initial == la description de chef d'agrés
   description_initial: {
-    type: String
+    type: String,
   },
   statut: {
     type: String,
     enum: ["entre", "en_cours", "termine"],
-    default: "entre"
-  }
+    default: "entre",
+  },
 });
 
 const Intervention = mongoose.model("Intervention", interventionSchema);
