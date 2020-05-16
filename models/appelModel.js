@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const dateTime = require("./../utils/moment").dateTime;
 
 const appelSchema = new mongoose.Schema({
     numTel: {
@@ -16,10 +15,7 @@ const appelSchema = new mongoose.Schema({
             required: [true, "Vous devez saisir la lng"]
         },
     },
-    dateTimeAppel: {
-        type: Date,
-        default: dateTime
-    },
+   
 });
 
 

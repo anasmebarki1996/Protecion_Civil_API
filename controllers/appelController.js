@@ -33,24 +33,6 @@ exports.getAppel = catchAsync(async (req, res, next) => {
         numTel: req.body.numTel,
     });
     if (appel) {
-        console.log(appel)
-        await Intervention.create({
-            numTel: appel.numTel,
-            adresse: {
-                gps_coordonnee: {
-                    lat: appel.gps_coordonnee.lat,
-                    lng: appel.gps_coordonnee.lng
-                }
-            },
-            dateTimeAppel: appel.dateTimeAppel,
-            cco_agent: req.agent._id
-        });
-
-        // sans await parce qu'on s'en fout des données supprimé
-        // Appel.deleteOne({
-        //     numTel: appel.numTel
-        // });
-
         res.status(200).json({
             status: "success",
             appel

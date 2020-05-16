@@ -1,5 +1,6 @@
 "use strict";
 const Agent = require("./../models/agentModel");
+const Unite = require("./../models/uniteModel");
 const catchAsync = require("./../utils/catchAsync");
 const jwt = require("jsonwebtoken");
 const AppError = require("./../utils/appError");
@@ -128,4 +129,12 @@ exports.checkToken = catchAsync(async (req, res, next) => {
     res.status(200).json({
         status: "success",
     });
+});
+
+exports.checkUnite = catchAsync(async (req, res, next) => {
+    const unite = await Unite.findOne({
+        _id: req.agent.id_unite
+    });
+    req.unite = unite;
+    next();
 });

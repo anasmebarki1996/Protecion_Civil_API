@@ -31,23 +31,31 @@ const interventionSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Agent",
   },
+  id_unite: {
+    type: mongoose.Schema.ObjectId,
+    ref: "Unite",
+  },
+  id_node: {
+    type: mongoose.Schema.ObjectId,
+    ref: "Node",
+  },
+  // description = les choix de CCO comme accident ou un feu
+  description: {
+    type: String,
+  },
+  // la description de chef d'agrés
+  bilan: {
+    type: String,
+  },
   id_team: {
     type: mongoose.Schema.ObjectId,
   },
-  id_unite: [
-    {
-      // une intervention pourrait provenir d'une ou de plusieurs unités dans le cas de renfort
-      type: mongoose.Schema.ObjectId,
-      ref: "Unite",
-    },
-  ],
-
   // dateTimeAppel == l'heure de l'appel entrant
   dateTimeAppel: {
     type: Date,
     default: dateTime,
   },
-  // dateTimeDepart == l'heure du départ de la véhicule
+  // dateTimeDepart == l'heure du départ de l'engin'
   dateTimeDepart: {
     type: Date,
   },
@@ -59,18 +67,11 @@ const interventionSchema = new mongoose.Schema({
   dateTimeFin: {
     type: Date,
   },
-  // description_automatique == les choix de CCO comme accident ou un feu
-  description_automatique: {
-    type: String,
-  },
-  // description_initial == la description de chef d'agrés
-  description_initial: {
-    type: String,
-  },
+
   statut: {
     type: String,
-    enum: ["entre", "en_cours", "termine"],
-    default: "entre",
+    enum: ["envoye", "recu", "en_cours", "termine"],
+    default: "envoye",
   },
 });
 

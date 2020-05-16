@@ -44,6 +44,10 @@ const UniteSchema = new mongoose.Schema({
     unite_principale: {
         type: mongoose.Schema.ObjectId,
         ref: "Unite"
+    },
+    numTel: {
+        type: String,
+        required: [true, "Une Unitée doit avoir un numero de téléphone "],
     }
 
 });
