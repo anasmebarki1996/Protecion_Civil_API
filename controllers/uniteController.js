@@ -9,7 +9,6 @@ const {
 } = (mongoose = require("mongoose"));
 
 exports.createUnite = catchAsync(async (req, res, next) => {
-    console.log(req.body.gps_coordonnee);
     await Unite.create({
         nom: req.body.nom,
         adresse: {
@@ -28,6 +27,19 @@ exports.createUnite = catchAsync(async (req, res, next) => {
         status: "success",
     });
 });
+
+exports.getUnite = catchAsync(async (req, res, next) => {
+    const unite = await Unite.findOne({
+        _id: req.body.id_unite,
+    });
+
+    res.status(200).json({
+        status: "success",
+        unite
+    });
+
+});
+
 
 exports.updateChef_unite = catchAsync(async (req, res, next) => {
     await Unite.findOneAndUpdate({

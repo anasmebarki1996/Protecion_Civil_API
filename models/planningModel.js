@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const date = require("../utils/moment").date;
+const dateTime = require("../utils/moment").dateTime;
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 
@@ -40,6 +41,10 @@ const planningSchema = new mongoose.Schema({
                     type: Number,
                     required: [true, "Une Unitée  doit avoir lng "]
                 },
+                lastUpdate: {
+                    type: Date,
+                    default: dateTime,
+                }
             },
             disponibilite: {
                 type: Boolean,

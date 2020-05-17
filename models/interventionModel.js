@@ -63,11 +63,19 @@ const interventionSchema = new mongoose.Schema({
   dateTimeArrive: {
     type: Date,
   },
+  // si il y a un transfere vers l'hopital par exemple et le temps d'arrivé a l'hopital = temps fin
+  transfere: {
+    lieu: {
+      type: String,
+    },
+    dateTimeDepart: {
+      type: Date,
+    }
+  },
   // dateTimeFin == l'heure de la fin des traitement , sois ki youwasslou l'hopital sois ki ykamlou traitement nta3houm
   dateTimeFin: {
     type: Date,
   },
-
   statut: {
     type: String,
     enum: ["envoye", "recu", "en_cours", "termine"],

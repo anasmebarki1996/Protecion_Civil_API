@@ -5,7 +5,7 @@ const APIFeatures = require('../utils/apiFeatures')
 exports.getAgent = catchAsync(async (req, res, next) => {
     const agent = await Agent.findOne({
         id_unite: req.agent.id_unite,
-        _id: req.body.idAgent
+        _id: req.body.id_agent
     });
 
     if (!agent) {
@@ -58,7 +58,7 @@ exports.createAgent = catchAsync(async (req, res, next) => {
 
 exports.updatePersonnelAgent = catchAsync(async (req, res, next) => {
     await Agent.findOneAndUpdate({
-        _id: req.body.idAgent,
+        _id: req.body.id_agent,
         id_unite: req.agent.id_unite
     }, {
         $set: {
@@ -75,7 +75,7 @@ exports.updatePersonnelAgent = catchAsync(async (req, res, next) => {
 
 exports.updateCompteAgent = catchAsync(async (req, res, next) => {
     await Agent.findOneAndUpdate({
-        _id: req.body.idAgent,
+        _id: req.body.id_agent,
         id_unite: req.agent.id_unite
     }, {
         $set: {
@@ -90,7 +90,7 @@ exports.updateCompteAgent = catchAsync(async (req, res, next) => {
 
 exports.updatePasswordAgent = catchAsync(async (req, res, next) => {
     await Agent.findOneAndUpdate({
-        _id: req.body.idAgent,
+        _id: req.body.id_agent,
         id_unite: req.agent.id_unite
     }, {
         $set: {

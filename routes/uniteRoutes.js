@@ -7,6 +7,7 @@ const router = express.Router();
 
 router
     .post('/createUnite', uniteController.createUnite)
+    .post('/getUnite', uniteController.getUnite)
     .post('/updateChef_unite', uniteController.updateChef_unite)
     .post('/updateTypeUnite', uniteController.updateTypeUnite)
     .post('/updateInformationUnite', uniteController.updateInformationUnite)

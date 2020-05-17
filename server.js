@@ -81,6 +81,7 @@ const interventionRoutes = require("./routes/interventionRoutes");
 const appelRoutes = require("./routes/appelRoutes");
 const treeRoutes = require("./routes/treeRoutes");
 const planningRoutes = require("./routes/planningRoutes");
+const teamRoutes = require("./routes/teamRoutes");
 const uniteRoutes = require("./routes/uniteRoutes");
 const enginRoutes = require("./routes/enginRoutes");
 app.use("/API/", authRoutes);
@@ -89,6 +90,7 @@ app.use("/API/", interventionRoutes);
 app.use("/API/", appelRoutes);
 app.use("/API/", treeRoutes);
 app.use("/API/", planningRoutes);
+app.use("/API/", teamRoutes);
 app.use("/API/", uniteRoutes);
 app.use("/API/", enginRoutes);
 
