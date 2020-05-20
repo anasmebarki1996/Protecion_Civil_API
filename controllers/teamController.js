@@ -204,6 +204,7 @@ exports.getAdresseTeam = catchAsync(async (req, res, next) => {
 });
 
 exports.setAdresseTeam = catchAsync(async (req, res, next) => {
+  console.log(new Date(dateTime))
   const team = await Planning.findOneAndUpdate({
       id_unite: ObjectId(req.agent.id_unite),
       "calendrier.team._id": ObjectId(req.body.id_team),
@@ -211,7 +212,7 @@ exports.setAdresseTeam = catchAsync(async (req, res, next) => {
       $set: {
         "calendrier.$[].team.$[a].gps_coordonnee.lat": req.body.gps_coordonnee.lat,
         "calendrier.$[].team.$[a].gps_coordonnee.lng": req.body.gps_coordonnee.lng,
-        "calendrier.$[].team.$[a].gps_coordonnee.lastUpdate": dateTime,
+        "calendrier.$[].team.$[a].gps_coordonnee.lastUpdate": new Date(dateTime),
       },
     }, {
       arrayFilters: [{

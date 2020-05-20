@@ -2,9 +2,11 @@ const Appel = require("../models/appelModel");
 const Intervention = require("../models/interventionModel");
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const dateTime = require("../utils/moment").dateTime;
+const moment = require("../utils/moment").moment;
 
 exports.nouveauAppel = catchAsync(async (req, res, next) => {
-
+    console.log(dateTime)
     if (req.body.gps_coordonnee.lat && req.body.gps_coordonnee.lng && req.body.numTel) {
         await Appel.create({
             numTel: req.body.numTel,
@@ -12,6 +14,7 @@ exports.nouveauAppel = catchAsync(async (req, res, next) => {
                 lat: req.body.gps_coordonnee.lat,
                 lng: req.body.gps_coordonnee.lng
             },
+            dateTimeAppel: dateTime
         });
 
         res.status(200).json({
@@ -40,8 +43,6 @@ exports.getAppel = catchAsync(async (req, res, next) => {
 
     } else
         return next(new AppError("Numero inexistant , Veulliez introduire un nouveau numero", 401));
-
-
 });
 
 console.log("addDateTimeDepart à faire")

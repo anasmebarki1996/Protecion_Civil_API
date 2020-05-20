@@ -6,8 +6,9 @@ const router = express.Router();
 
 
 router
-    .post('/getAllIntervention', authController.protect, authController.checkUnite, interventionController.getAllInterventions)
-    // .post('/getIntervention', interventionController.getIntervention)
+    .post('/intervention/getAllIntervention', authController.protect, authController.checkUnite, interventionController.getAllIntervention)
+    .post('/intervention/getAllIntervention_EnCours', authController.protect, authController.checkUnite, interventionController.getAllIntervention_EnCours)
+    .post('/intervention/getAllIntervention_Recue', authController.protect, authController.checkUnite, interventionController.getAllIntervention_Recue)
     .post('/addDateTimeDepart', authController.protect, authController.restricTo('chef'), appelController.addDateTimeDepart)
     .post('/intervention/envoyerIntervention', authController.protect, interventionController.envoyerIntervention)
     .post('/intervention/getIntervention', authController.protect, authController.checkUnite, interventionController.getIntervention)

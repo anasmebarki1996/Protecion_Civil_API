@@ -6,38 +6,136 @@ const dateTime = require("../utils/moment").dateTime;
 const APIFeatures = require("../utils/apiFeatures");
 const AppError = require("../utils/appError");
 const {
-  Types: { ObjectId },
+  Types: {
+    ObjectId
+  },
 } = (mongoose = require("mongoose"));
 
-exports.getAllInterventions = catchAsync(async (req, res) => {
+exports.getAllIntervention = catchAsync(async (req, res) => {
   // EXECUTE QUERY
-  let features, interventions;
+  let features, interventions = [];
   if (req.unite.type == "secondaire") {
-    features = new APIFeatures(
-      Intervention.find({
-        id_unite: ObjectId(req.agent.id_unite),
-      }),
-      req.query
-    );
+    if (req.body.date) {
+      features = new APIFeatures(
+        Intervention.find({
+          id_unite: ObjectId(req.agent.id_unite),
+          dateTimeAppel: req.body.date
+        }),
+        req.query
+      ).search().paginate().sort();
+    } else {
+      features = new APIFeatures(
+        Intervention.find({
+          id_unite: ObjectId(req.agent.id_unite),
+        }),
+        req.query
+      ).search().paginate().sort();
+    }
     interventions = await features.query;
   } else {
-    console.log(
-      "####### getAllIntervention a un probleme pour l'unite principale"
-    );
     const unites = await Unite.find({
       unite_principale: ObjectId(req.unite._id),
+    }, {
+      _id: 1
     });
-    let inter = [];
-    let int;
-    for (let i = 0; i < unites.length; i++) {
-      int = Intervention.find({
-        id_unite: req.agent.id_unite,
-      });
-      features = new APIFeatures(int, req.query).search().paginate().sort();
-      inter = await features.query;
-      interventions.concat(inter);
+    let unite = unites.map((x) => ObjectId(x._id));
+    if (req.body.date) {
+      features = new APIFeatures(Intervention.find({
+        id_unite: {
+          $in: unite
+        },
+        dateTimeAppel: req.body.date
+      }), req.query).search().paginate().sort();
+    } else {
+      features = new APIFeatures(Intervention.find({
+        id_unite: {
+          $in: unite
+        },
+      }), req.query).search().paginate().sort();
     }
+    interventions = await features.query;
+    console.log(interventions)
   }
+  // SEND RESPONSE
+  res.status(200).json({
+    status: "success",
+    interventions,
+    interventions_total: interventions.length,
+  });
+});
+
+exports.getAllIntervention_EnCours = catchAsync(async (req, res) => {
+  // EXECUTE QUERY
+  let features, interventions = [];
+  if (req.unite.type == "secondaire") {
+    if (req.body.date) {
+      features = new APIFeatures(
+        Intervention.find({
+          id_unite: ObjectId(req.agent.id_unite),
+          dateTimeAppel: dateTime,
+          statut: "en cours"
+        }),
+        req.query
+      ).search().paginate().sort();
+    } else {
+      features = new APIFeatures(
+        Intervention.find({
+          id_unite: ObjectId(req.agent.id_unite),
+          dateTimeAppel: dateTime,
+          statut: "en cours"
+        }),
+        req.query
+      ).search().paginate().sort();
+    }
+    interventions = await features.query;
+  } else {
+    const unites = await Unite.find({
+      unite_principale: ObjectId(req.unite._id),
+    }, {
+      _id: 1
+    });
+    let unite = unites.map((x) => ObjectId(x._id));
+    if (req.body.date) {
+      features = new APIFeatures(Intervention.find({
+        id_unite: {
+          $in: unite
+        },
+        dateTimeAppel: req.body.date,
+        dateTimeAppel: dateTime,
+        statut: "en cours"
+      }), req.query).search().paginate().sort();
+    } else {
+      features = new APIFeatures(Intervention.find({
+        id_unite: {
+          $in: unite
+        },
+        dateTimeAppel: dateTime,
+        statut: "en cours"
+      }), req.query).search().paginate().sort();
+    }
+    interventions = await features.query;
+  }
+  // SEND RESPONSE
+  res.status(200).json({
+    status: "success",
+    interventions,
+    interventions_total: interventions.length,
+  });
+});
+
+exports.getAllIntervention_Recue = catchAsync(async (req, res) => {
+  // EXECUTE QUERY
+  let features, interventions = [];
+
+  features = new APIFeatures(
+    Intervention.find({
+      id_unite: ObjectId(req.agent.id_unite),
+      statut: "recu"
+    }),
+    req.query
+  );
+  interventions = await features.query;
+
   // SEND RESPONSE
   res.status(200).json({
     status: "success",
@@ -65,8 +163,9 @@ exports.getIntervention = catchAsync(async (req, res, next) => {
     } else {
       const unites = await Unite.findOne({
         _id: ObjectId(intervention.id_unite),
-        unite_principale: ObjectId(req.unite.id_unite),
+        unite_principale: ObjectId(req.unite._id),
       });
+      console.log(unites)
       if (!unites) {
         return next(
           new AppError(
@@ -84,16 +183,13 @@ exports.getIntervention = catchAsync(async (req, res, next) => {
 });
 
 exports.addDateTimeDepart = catchAsync(async (req, res) => {
-  Intervention.updateOne(
-    {
-      chef: req.user._id,
+  Intervention.updateOne({
+    chef: req.user._id,
+  }, {
+    $set: {
+      dateTimeDepart: dateTime,
     },
-    {
-      $set: {
-        dateTimeDepart: dateTime,
-      },
-    }
-  );
+  });
   res.status(200).json({
     status: "success",
   });
