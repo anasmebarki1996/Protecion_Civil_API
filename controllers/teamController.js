@@ -174,7 +174,6 @@ exports.getAdresseAllTeams = catchAsync(async (req, res, next) => {
   });
 });
 
-
 exports.getAdresseTeam = catchAsync(async (req, res, next) => {
   const team = await Planning.aggregate([{
       $unwind: "$calendrier",

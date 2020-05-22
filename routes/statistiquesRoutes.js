@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 router
-    .post('/statistique/getInterventionParJour', authController.protect, authController.checkUnite, statistiqueController.getInterventionParJour)
+    .post('/statistique/getInterventionParJourPendantUnMois', authController.protect, authController.checkUnite, statistiqueController.getInterventionParJourPendantUnMois)
     .post('/statistique/getInterventionParMois', authController.protect, authController.checkUnite, statistiqueController.getInterventionParMois)
 
 

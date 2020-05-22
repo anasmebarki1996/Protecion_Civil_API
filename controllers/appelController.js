@@ -31,6 +31,9 @@ exports.getAppel = catchAsync(async (req, res, next) => {
     // 2- le cco_agent cherche le numéro des qu'il le trouve il cree une intervention 
     // 3- le systeme supprime l'appel directement
     // quand c'est un success l'agent_cco commence a faire le choix d'IA
+    if (req.body.numTel.length != 10) {
+        return next(new AppError("Veulliez vous vérifier le numero", 400));
+    }
 
     const appel = await Appel.findOne({
         numTel: req.body.numTel,
@@ -42,7 +45,7 @@ exports.getAppel = catchAsync(async (req, res, next) => {
         });
 
     } else
-        return next(new AppError("Numero inexistant , Veulliez introduire un nouveau numero", 401));
+        return next(new AppError("Ce numéro n'utilise pas l'application", 404));
 });
 
 console.log("addDateTimeDepart à faire")

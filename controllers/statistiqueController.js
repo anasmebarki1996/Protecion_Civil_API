@@ -1,5 +1,4 @@
 const Intervention = require("./../models/interventionModel");
-const Appel = require("./../models/appelModel");
 const Unite = require("./../models/uniteModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
@@ -110,7 +109,7 @@ exports.getInterventionJournalParIdNode = catchAsync(async (req, res, next) => {
         interventions,
     });
 });
-exports.getInterventionParJour = catchAsync(async (req, res, next) => {
+exports.getInterventionParJourPendantUnMois = catchAsync(async (req, res, next) => {
     var date = new Date(req.body.date);
     if (!req.body.date || !(date instanceof Date) || isNaN(date.valueOf())) {
         return next(
@@ -283,7 +282,7 @@ exports.getInterventionParJour = catchAsync(async (req, res, next) => {
                 {
                     $project: {
                         _id: 0,
-                        datetimeappel: 1,
+                        dateTimeAppel: 1,
                     },
                 },
                 {
