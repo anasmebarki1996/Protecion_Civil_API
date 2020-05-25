@@ -144,6 +144,64 @@ exports.getAllIntervention_Recue = catchAsync(async (req, res) => {
   });
 });
 
+exports.getAllIntervention_name = catchAsync(async (req, res) => {
+  // EXECUTE QUERY
+
+  const interventions = await Intervention.aggregate([{
+      $project: {
+        _id: 0,
+        id_node: 1
+      }
+    },
+    {
+      $group: {
+        _id: "$id_node",
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        id_node: "$_id"
+      }
+    }, {
+      $lookup: {
+        from: "nodes",
+        let: {
+          id_node: "$id_node",
+        },
+        pipeline: [{
+            $match: {
+              $expr: {
+                $eq: ["$_id", "$$id_node"],
+              },
+            },
+          },
+          {
+            $project: {
+              name: 1,
+              _id: 0,
+            },
+          },
+        ],
+        as: "team",
+      },
+    }, {
+      $unwind: "$team"
+    },
+    {
+      $project: {
+        id_node: 1,
+        name: "$team.name"
+      }
+    },
+  ]);
+
+  // SEND RESPONSE
+  res.status(200).json({
+    status: "success",
+    interventions,
+  });
+});
 exports.getIntervention = catchAsync(async (req, res, next) => {
   let intervention = await Intervention.findOne({
     _id: req.body.id_intervention,
@@ -165,7 +223,6 @@ exports.getIntervention = catchAsync(async (req, res, next) => {
         _id: ObjectId(intervention.id_unite),
         unite_principale: ObjectId(req.unite._id),
       });
-      console.log(unites)
       if (!unites) {
         return next(
           new AppError(

@@ -11,5 +11,5 @@ router
     .post('/team/getAdresseTeam', authController.protect, teamController.getAdresseTeam)
     .post('/team/setAdresseTeam', authController.protect, teamController.setAdresseTeam)
 
-    
+
 module.exports = router;

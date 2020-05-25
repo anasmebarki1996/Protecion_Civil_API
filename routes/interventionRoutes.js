@@ -12,6 +12,7 @@ router
     .post('/addDateTimeDepart', authController.protect, authController.restricTo('chef'), appelController.addDateTimeDepart)
     .post('/intervention/envoyerIntervention', authController.protect, interventionController.envoyerIntervention)
     .post('/intervention/getIntervention', authController.protect, authController.checkUnite, interventionController.getIntervention)
+    .get('/intervention/getAllIntervention_name', authController.protect, authController.checkUnite, interventionController.getAllIntervention_name)
 
 
 module.exports = router;
