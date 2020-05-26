@@ -137,12 +137,7 @@ exports.createNode = catchAsync(async (req, res) => {
 exports.updateNode = catchAsync(async (req, res, next) => {
     if (!req.params.id)
         return next(new AppError("Node Id is not defined", 400))
-
-
     const _id = req.params.id
-
-
-
     let update = {}
     if (req.body.name) update["name"] = req.body.name
     if (req.body.icon) update["icon"] = req.body.icon
@@ -223,10 +218,7 @@ exports.deleteNode = catchAsync(async (req, res, next) => {
 
 })
 
-
-
 exports.getAllEngins = catchAsync(async (req, res, next) => {
-
     const engins = await Engin.aggregate([{
         $group: {
             _id: '$name',
@@ -238,6 +230,5 @@ exports.getAllEngins = catchAsync(async (req, res, next) => {
     res.status(200).json({
         status: "success",
         data: engins
-
     })
 })

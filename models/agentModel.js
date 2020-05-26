@@ -83,7 +83,7 @@ const agentSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ["admin", "cco_agent", "agent"], // chef = Chef d'agrès
+        enum: ["admin", "cco_agent", "agent"],
         default: "agent"
     },
     created_at: {

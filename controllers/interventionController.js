@@ -11,51 +11,52 @@ const {
   },
 } = (mongoose = require("mongoose"));
 
-exports.getAllIntervention = catchAsync(async (req, res) => {
+exports.getAllIntervention = catchAsync(async (req, res, next) => {
+  console.log(req.unite)
+
+  var date = new Date(req.body.date);
+  if (!req.body.date || !(date instanceof Date) || isNaN(date.valueOf())) {
+    return next(new AppError("Veuilliez vous verifier la date", 403));
+  }
+  var start = new Date(req.body.date);
+  start.setHours(0);
+  start.setMinutes(0);
+  start.setSeconds(0);
+  var end = new Date(req.body.date);
+  end.setHours(23);
+  end.setMinutes(59);
+  end.setSeconds(59);
   // EXECUTE QUERY
   let features, interventions = [];
+  const unites = await Unite.find({
+    unite_principale: ObjectId(req.unite._id),
+  }, {
+    _id: 1
+  });
+  let unite = unites.map((x) => ObjectId(x._id));
+  interventions = Intervention.find({
+    dateTimeAppel: {
+      $gte: start,
+      $lte: end,
+    },
+  })
   if (req.unite.type == "secondaire") {
-    if (req.body.date) {
-      features = new APIFeatures(
-        Intervention.find({
-          id_unite: ObjectId(req.agent.id_unite),
-          dateTimeAppel: req.body.date
-        }),
-        req.query
-      ).search().paginate().sort();
-    } else {
-      features = new APIFeatures(
-        Intervention.find({
-          id_unite: ObjectId(req.agent.id_unite),
-        }),
-        req.query
-      ).search().paginate().sort();
-    }
-    interventions = await features.query;
-  } else {
-    const unites = await Unite.find({
-      unite_principale: ObjectId(req.unite._id),
-    }, {
-      _id: 1
+    interventions = interventions.where({
+      id_unite: ObjectId(req.agent.id_unite),
     });
-    let unite = unites.map((x) => ObjectId(x._id));
-    if (req.body.date) {
-      features = new APIFeatures(Intervention.find({
-        id_unite: {
-          $in: unite
-        },
-        dateTimeAppel: req.body.date
-      }), req.query).search().paginate().sort();
-    } else {
-      features = new APIFeatures(Intervention.find({
-        id_unite: {
-          $in: unite
-        },
-      }), req.query).search().paginate().sort();
-    }
-    interventions = await features.query;
-    console.log(interventions)
+  } else {
+    interventions = interventions.where({
+      id_unite: {
+        $in: unite
+      },
+    });
   }
+  features = await new APIFeatures(
+    interventions,
+    req.query
+  ).search().paginate().sort();
+
+  interventions = await features.query;
   // SEND RESPONSE
   res.status(200).json({
     status: "success",

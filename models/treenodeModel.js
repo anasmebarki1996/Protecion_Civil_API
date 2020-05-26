@@ -2,8 +2,6 @@ const mongoose = require("mongoose");
 const treeValidator = require("./../validators/treeValidator")
 
 
-
-
 const nodeSchema = new mongoose.Schema({
     name:{
         type:String,

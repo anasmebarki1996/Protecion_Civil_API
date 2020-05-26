@@ -3,20 +3,14 @@ const treeController = require('../controllers/treeController');
 const authController = require('../controllers/authController');
 const router = express.Router();
 
-/*
-router
-    .post('/createTree', treeController.createTree)
-    .get('/tree', treeController.getAllTree)
-    .put('/tree',treeController.updateTree)
-*/
 
 router
-    .get('/tree',treeController.displayTree) //returns the graph of all the tree
-    .get('/tree/nodes/:parent_id?',treeController.getNodes) //return nodes of a specified parent
-    .get('/tree/node/:id?',treeController.getNode) //return node with id
-    .get('/tree/path/:child_id?',treeController.getNodePath) //return nodes of a specified parent
-    .post('/tree',treeController.createNode)
-    .put('/tree/:id?',treeController.updateNode)
-    .delete('/tree/:id?',treeController.deleteNode)
-    .get('/engin',treeController.getAllEngins)
+    .get('/tree', authController.protect, treeController.displayTree) //returns the graph of all the tree
+    .get('/tree/nodes/:parent_id?', authController.protect, treeController.getNodes) //return nodes of a specified parent
+    .get('/tree/node/:id?', authController.protect, treeController.getNode) //return node with id
+    .get('/tree/path/:child_id?', authController.protect, treeController.getNodePath) //return nodes of a specified parent
+    .post('/tree', authController.protect, authController.restricTo('admin'), treeController.createNode)
+    .put('/tree/:id?', authController.protect, authController.restricTo('admin'), treeController.updateNode)
+    .delete('/tree/:id?', authController.protect, authController.restricTo('admin'), treeController.deleteNode)
+    .get('/engin', authController.protect, treeController.getAllEngins)
 module.exports = router;

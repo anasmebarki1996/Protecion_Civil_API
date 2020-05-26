@@ -9,7 +9,7 @@ router
     .post('/createAgent', authController.protect, agentController.createAgent)
     .post('/getAgent', authController.protect, agentController.getAgent)
     .post('/searchAgent', authController.protect, agentController.searchAgent)
-    .post('/getAllAgents', authController.protect, agentController.getAllAgents)
+    .post('/getAllAgents', authController.protect, authController.checkUnite, agentController.getAllAgents)
     .post('/updatePersonnelAgent', authController.protect, agentController.updatePersonnelAgent)
     .post('/updateCompteAgent', authController.protect, agentController.updateCompteAgent)
     .post('/updatePasswordAgent', authController.protect, agentController.updatePasswordAgent)

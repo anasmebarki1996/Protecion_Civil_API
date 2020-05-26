@@ -1,6 +1,12 @@
 const Agent = require("../models/agentModel");
+const Unite = require("../models/uniteModel");
 const catchAsync = require('../utils/catchAsync');
-const APIFeatures = require('../utils/apiFeatures')
+const APIFeatures = require('../utils/apiFeatures');
+const {
+    Types: {
+        ObjectId
+    },
+} = (mongoose = require("mongoose"));
 
 exports.getAgent = catchAsync(async (req, res, next) => {
     const agent = await Agent.findOne({
@@ -19,14 +25,30 @@ exports.getAgent = catchAsync(async (req, res, next) => {
     })
 });
 
-
 exports.getAllAgents = catchAsync(async (req, res) => {
-    const features = new APIFeatures(Agent.find({
-        id_unite: req.agent.id_unite
-    }), req.query).search().paginate().sort();
-    const agents = await features.query;
-
-    console.log(agents)
+    let agents = []
+    if (req.unite.type == "secondaire") {
+        agents = Agent.find({
+            id_unite: req.agent.id_unite,
+            role: "agent"
+        });
+    } else {
+        const unites = await Unite.find({
+            unite_principale: ObjectId(req.unite._id),
+        }, {
+            _id: 1,
+        });
+        let unite = unites.map((x) => ObjectId(x._id));
+        unite.push(ObjectId(req.unite._id));
+        agents = Agent.find({
+            id_unite: {
+                $in: unite,
+            },
+            role: "agent"
+        });
+    }
+    const features = new APIFeatures(agents, req.query).search().paginate().sort();
+    agents = await features.query;
     res.status(200).json({
         status: "success",
         agents,
@@ -37,7 +59,7 @@ exports.getAllAgents = catchAsync(async (req, res) => {
 
 
 exports.createAgent = catchAsync(async (req, res, next) => {
-    const newAgent = await Agent.create({
+    await Agent.create({
         nom: req.body.nom,
         prenom: req.body.prenom,
         date_de_naissance: req.body.date_de_naissance,
@@ -51,7 +73,6 @@ exports.createAgent = catchAsync(async (req, res, next) => {
 
     res.status(200).json({
         status: "success",
-        newAgent
     });
 });
 
@@ -104,37 +125,20 @@ exports.updatePasswordAgent = catchAsync(async (req, res, next) => {
 
 
 exports.searchAgent = catchAsync(async (req, res, next) => {
-
-    console.log("#### il faut ajouter la contrainte type de l'agent");
-    const agents = await Agent.aggregate(
-        [{
-                $match: {
-                    id_unite: req.agent.id_unite,
-                    // $or: [{
-                    //     nom: {
-                    //         $regex: req.body.input,
-                    //         $options: 'i'
-                    //     },
-                    //     prenom: {
-                    //         $regex: req.body.input,
-                    //         $options: 'i'
-                    //     },
-                    //     username: {
-                    //         $regex: req.body.input,
-                    //         $options: 'i'
-                    //     },
-                    // }]
-                }
-            },
-            {
-                $project: {
-                    result: {
-                        $concat: ["$nom", " ", "$prenom", " ---", "$username"]
-                    }
+    const agents = await Agent.aggregate([{
+            $match: {
+                id_unite: req.agent.id_unite,
+                role: "agent"
+            }
+        },
+        {
+            $project: {
+                result: {
+                    $concat: ["$nom", " ", "$prenom", " ---", "$username"]
                 }
             }
-        ]
-    )
+        }
+    ])
     res.status(200).json({
         status: "success",
         agents
