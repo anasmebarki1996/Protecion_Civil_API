@@ -94,7 +94,6 @@ exports.updateInformationUnite = catchAsync(async (req, res, next) => {
 });
 
 exports.getUnitePlusProche = catchAsync(async (req, res, next) => {
-    console.log(req.body)
     if (
         !isFinite(req.body.lat) ||
         req.body.lat > 37 ||

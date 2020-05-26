@@ -2,6 +2,8 @@ const Agent = require("../models/agentModel");
 const Unite = require("../models/uniteModel");
 const catchAsync = require('../utils/catchAsync');
 const APIFeatures = require('../utils/apiFeatures');
+const AppError = require('../utils/appError');
+
 const {
     Types: {
         ObjectId

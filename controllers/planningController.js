@@ -17,7 +17,6 @@ exports.createPlanning = catchAsync(async (req, res, next) => {
     calendrier: [],
   });
 
-  // console.log(query)
   res.status(200).json({
     status: "success",
   });
@@ -538,7 +537,6 @@ exports.addEngin = catchAsync(async (req, res, next) => {
     },
     (err, doc) => {
       if (doc) {
-        console.log("aaaaaaaaaaaaaaaa");
         return next(new AppError("L'engin' existe déja", 403));
       }
     }

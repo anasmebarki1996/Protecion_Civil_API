@@ -203,7 +203,6 @@ exports.getAdresseTeam = catchAsync(async (req, res, next) => {
 });
 
 exports.setAdresseTeam = catchAsync(async (req, res, next) => {
-  console.log(new Date(dateTime))
   const team = await Planning.findOneAndUpdate({
       id_unite: ObjectId(req.agent.id_unite),
       "calendrier.team._id": ObjectId(req.body.id_team),
@@ -234,7 +233,6 @@ exports.setAdresseTeam = catchAsync(async (req, res, next) => {
 });
 
 exports.getTeamID = catchAsync(async (req, res, next) => {
-  console.log(req.agent._id)
   const id_team = await Planning.aggregate([{
       $unwind: "$calendrier",
     },

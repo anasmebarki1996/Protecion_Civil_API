@@ -71,8 +71,6 @@ exports.getInterventionStatistiques = catchAsync(async (req, res, next) => {
     });
   }
   if (req.body.choix == "annuel") {
-    console.log(req.body.choix);
-
     interventions = interventions
       .group({
         _id: {
@@ -445,7 +443,6 @@ exports.getStatistiques = catchAsync(async (req, res, next) => {
     }
   }, ]);
   let unite = unites.map((x) => ObjectId(x.id_unite));
-  console.log(unite)
   let nombreAgents = await Agent.aggregate([{
       $match: {
         id_unite: {

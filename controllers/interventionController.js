@@ -12,7 +12,6 @@ const {
 } = (mongoose = require("mongoose"));
 
 exports.getAllIntervention = catchAsync(async (req, res, next) => {
-  console.log(req.unite)
 
   var date = new Date(req.body.date);
   if (!req.body.date || !(date instanceof Date) || isNaN(date.valueOf())) {

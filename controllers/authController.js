@@ -60,7 +60,6 @@ exports.login = catchAsync(async (req, res, next) => {
     res.cookie("agent_jwt", token, cookieOptions);
 
 
-    console.log(agent)
     res.status(200).json({
         status: "success",
         agent_id: agent._id,
