@@ -27,7 +27,11 @@ const interventionSchema = new mongoose.Schema({
       },
     },
   },
-  cco_agent: {
+  cco_agent_principale: {
+    type: mongoose.Schema.ObjectId,
+    ref: "Agent",
+  },
+  cco_agent_secondaire: {
     type: mongoose.Schema.ObjectId,
     ref: "Agent",
   },
@@ -38,10 +42,12 @@ const interventionSchema = new mongoose.Schema({
   id_node: {
     type: mongoose.Schema.ObjectId,
     ref: "Node",
+    required: [true, "Vous devez saisir le type d'intervention"],
   },
   // description = les choix de CCO comme accident ou un feu
   description: {
-    type: String,
+    type: Array,
+    required: [true, "Vous devez saisir le type d'intervention"],
   },
   // la description de chef d'agrés
   bilan: {
@@ -78,8 +84,15 @@ const interventionSchema = new mongoose.Schema({
   },
   statut: {
     type: String,
-    enum: ["envoye", "recu", "en_cours", "termine"],
+    enum: ["envoye", "recu", "depart", "en_cours", "transfere", "termine", "annule"],
     default: "envoye",
+    // envoye à l'unité la plus proche
+    // recu => envoyé au chef d'agrée
+    // depart => accepté par le chef d'agrée
+    // en_cours => arrivé à la distination
+    // transfere => trasfere vers un hopital
+    // terminé => 
+    // annule
   },
 });
 

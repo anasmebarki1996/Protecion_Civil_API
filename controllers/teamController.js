@@ -271,3 +271,107 @@ exports.getTeamID = catchAsync(async (req, res, next) => {
     id_team: id_team[0],
   });
 });
+
+// pour avoir la liste des equipes disponible pour leur envoyer les interventions
+exports.getTeamsDisponible = catchAsync(async (req, res, next) => {
+  const teams = await Planning.aggregate([{
+      $unwind: "$calendrier",
+    },
+    {
+      $unwind: "$calendrier.team",
+    },
+    {
+      $match: {
+        id_unite: ObjectId(req.agent.id_unite),
+        "calendrier.date": new Date("2020-04-02"),
+      },
+    },
+    {
+      $unwind: "$calendrier.team.agents",
+    },
+    {
+      $match: {
+        "calendrier.team.agents.type": "chef"
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        id_team: "$calendrier.team._id",
+        id_agent: "$calendrier.team.agents.agent",
+        id_engin: "$calendrier.team.engin",
+        disponibilite: "$calendrier.team.disponibilite",
+        gps_coordonnee: "$calendrier.team.gps_coordonnee",
+      },
+    },
+    {
+      $lookup: {
+        from: "agents",
+        let: {
+          id_agent: "$id_agent",
+        },
+        pipeline: [{
+            $match: {
+              $expr: {
+                $eq: ["$_id", "$$id_agent"],
+              },
+            },
+          },
+          {
+            $project: {
+              nom: 1,
+              prenom: 1,
+              numTel: 1,
+              _id: 1,
+            },
+          },
+        ],
+        as: "agent",
+      },
+    },
+    {
+      $lookup: {
+        from: "engins",
+        let: {
+          id_engin: "$id_engin",
+        },
+        pipeline: [{
+            $match: {
+              $expr: {
+                $eq: ["$_id", "$$id_engin"],
+              },
+            },
+          },
+          {
+            $project: {
+              code_name: 1,
+              panne: 1,
+              _id: 1,
+            },
+          },
+        ],
+        as: "engin",
+      },
+    },
+    {
+      $unwind: "$agent",
+    },
+    {
+      $unwind: "$engin",
+    },
+    // {
+    //   $project: {
+    //     _id: 0,
+    //     id_team: "$calendrier.team._id",
+    //     disponibilite: "$calendrier.team.disponibilite",
+    //     gps_coordonnee: "$calendrier.team.gps_coordonnee",
+    //   },
+    // },
+  ]);
+
+  res.status(200).json({
+    status: "success",
+    teams,
+  });
+});
+

@@ -64,85 +64,7 @@ exports.getAllIntervention = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getAllIntervention_EnCours = catchAsync(async (req, res) => {
-  // EXECUTE QUERY
-  let features, interventions = [];
-  if (req.unite.type == "secondaire") {
-    if (req.body.date) {
-      features = new APIFeatures(
-        Intervention.find({
-          id_unite: ObjectId(req.agent.id_unite),
-          dateTimeAppel: dateTime,
-          statut: "en cours"
-        }),
-        req.query
-      ).search().paginate().sort();
-    } else {
-      features = new APIFeatures(
-        Intervention.find({
-          id_unite: ObjectId(req.agent.id_unite),
-          dateTimeAppel: dateTime,
-          statut: "en cours"
-        }),
-        req.query
-      ).search().paginate().sort();
-    }
-    interventions = await features.query;
-  } else {
-    const unites = await Unite.find({
-      unite_principale: ObjectId(req.unite._id),
-    }, {
-      _id: 1
-    });
-    let unite = unites.map((x) => ObjectId(x._id));
-    if (req.body.date) {
-      features = new APIFeatures(Intervention.find({
-        id_unite: {
-          $in: unite
-        },
-        dateTimeAppel: req.body.date,
-        dateTimeAppel: dateTime,
-        statut: "en cours"
-      }), req.query).search().paginate().sort();
-    } else {
-      features = new APIFeatures(Intervention.find({
-        id_unite: {
-          $in: unite
-        },
-        dateTimeAppel: dateTime,
-        statut: "en cours"
-      }), req.query).search().paginate().sort();
-    }
-    interventions = await features.query;
-  }
-  // SEND RESPONSE
-  res.status(200).json({
-    status: "success",
-    interventions,
-    interventions_total: interventions.length,
-  });
-});
 
-exports.getAllIntervention_Recue = catchAsync(async (req, res) => {
-  // EXECUTE QUERY
-  let features, interventions = [];
-
-  features = new APIFeatures(
-    Intervention.find({
-      id_unite: ObjectId(req.agent.id_unite),
-      statut: "recu"
-    }),
-    req.query
-  );
-  interventions = await features.query;
-
-  // SEND RESPONSE
-  res.status(200).json({
-    status: "success",
-    interventions,
-    interventions_total: interventions.length,
-  });
-});
 
 exports.getAllIntervention_name = catchAsync(async (req, res) => {
   // EXECUTE QUERY
@@ -252,6 +174,83 @@ exports.addDateTimeDepart = catchAsync(async (req, res) => {
   });
 });
 
+
+
+exports.getAllIntervention_Envoye = catchAsync(async (req, res) => {
+  // EXECUTE QUERY
+  let features, interventions = [];
+  features = new APIFeatures(
+    Intervention.find({
+      id_unite: ObjectId(req.agent.id_unite),
+      statut: "envoye"
+    }),
+    req.query
+  ).search().paginate().sort();
+  interventions = await features.query;
+
+  // SEND RESPONSE
+  res.status(200).json({
+    status: "success",
+    interventions,
+    interventions_total: interventions.length,
+  });
+});
+
+exports.getAllIntervention_EnCours = catchAsync(async (req, res) => {
+  // EXECUTE QUERY
+  let features, interventions = [];
+  var start = new Date(dateTime);
+  start.setHours(0);
+  start.setMinutes(0);
+  start.setSeconds(0);
+  var end = new Date(dateTime);
+  end.setHours(23);
+  end.setMinutes(59);
+  end.setSeconds(59);
+
+  interventions = Intervention.find({
+    dateTimeAppel: {
+      $gte: start,
+      $lte: end,
+    },
+    statut: {
+      "$in": ["recu", "depart", "en_cours", "transfere"]
+    }
+  })
+
+  if (req.unite.type == "secondaire") {
+    interventions.where({
+      id_unite: ObjectId(req.agent.id_unite),
+    })
+  } else {
+    const unites = await Unite.find({
+      unite_principale: ObjectId(req.unite._id),
+    }, {
+      _id: 1,
+    });
+    let unite = unites.map((x) => ObjectId(x._id));
+    interventions = intervention.where({
+      id_unite: {
+        $in: unite,
+      },
+    });
+  }
+
+  features = new APIFeatures(
+    interventions,
+    req.query
+  ).search().paginate().sort();
+
+  interventions = await features.query;
+  // SEND RESPONSE
+  res.status(200).json({
+    status: "success",
+    interventions,
+    interventions_total: interventions.length,
+  });
+});
+
+
 exports.envoyerIntervention = catchAsync(async (req, res, next) => {
   console.log("envoyerIntervention : manque id_node + description");
 
@@ -280,5 +279,32 @@ exports.envoyerIntervention = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
+  });
+});
+
+exports.envoyerInterventionAuChef = catchAsync(async (req, res, next) => {
+  const intervention = await Intervention.findOne({
+    _id: req.body.id_intervention,
+    statut: "envoye"
+  })
+
+  if (!intervention) {
+    return next(new AppError("intervention non disponible, vous devez acctualiser la page", 403));
+  }
+
+  await Intervention.findOneAndUpdate({
+    _id: req.body.id_intervention,
+  }, {
+    $set: {
+      cco_agent_secondaire: req.agent._id,
+      id_unite: req.agent.id_unite,
+      id_team: req.body.id_team,
+      statut: "recu",
+    }
+  });
+
+  res.status(200).json({
+    status: "success",
+    intervention
   });
 });
