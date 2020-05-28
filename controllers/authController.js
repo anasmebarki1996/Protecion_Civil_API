@@ -59,9 +59,15 @@ exports.login = catchAsync(async (req, res, next) => {
     // if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
     res.cookie("agent_jwt", token, cookieOptions);
 
+    res.set("Authorization",token);
 
+    console.log(token);
+
+    
+    console.log(agent)
     res.status(200).json({
         status: "success",
+        id_unite:agent.id_unite,
         agent_id: agent._id,
         agent_nom: agent.nom,
         agent_role: agent.role,
@@ -83,7 +89,12 @@ exports.protect = catchAsync(async (req, res, next) => {
     // 1) Getting token and check of it's there
     if (req.headers.cookie) {
         token = req.headers.cookie.split("agent_jwt=")[1];
+    }else if (req.headers.authorization){
+        token = req.headers.authorization;
     }
+
+    
+
 
     if (!token) {
         return next(

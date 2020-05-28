@@ -375,3 +375,176 @@ exports.getTeamsDisponible = catchAsync(async (req, res, next) => {
   });
 });
 
+
+var getTeamId = async function(agent){
+  const id_team = await Planning.aggregate([{
+    $unwind: "$calendrier",
+  },
+  {
+    $unwind: "$calendrier.team",
+  },
+  {
+    $match: {
+      id_unite: ObjectId(agent.id_unite),
+      "calendrier.date": new Date("2020-04-02"),
+    },
+  },
+  {
+    $project: {
+      _id: 0,
+      team: "$calendrier.team",
+    },
+  },
+  {
+    $unwind: "$team.agents",
+  },
+  {
+    $match: {
+      "team.agents.agent": ObjectId(agent._id),
+    },
+  },
+  {
+    $project: {
+      _id: "$team._id",
+    },
+  },
+]);
+
+return id_team[0]._id
+}
+
+
+exports.getTeamAndroid = catchAsync(async (req, res, next) => {
+
+  const team_id = req.params.id || await getTeamId(req.agent)
+
+  console.log(team_id)
+  
+  const team = await Planning.aggregate([{
+      $unwind: "$calendrier",
+    },
+    {
+      $unwind: "$calendrier.team",
+    },
+    {
+      $match: {
+        id_unite: ObjectId(req.agent.id_unite),
+        "calendrier.team._id": ObjectId(team_id),
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        team: "$calendrier.team",
+        "calendrier.date": 1,
+      },
+    },
+    {
+      $unwind: "$team.agents",
+    },
+    {
+      $lookup: {
+        from: "agents",
+        let: {
+          agent: "$team.agents.agent",
+        },
+        pipeline: [{
+            $match: {
+              $expr: {
+                $eq: ["$_id", "$$agent"],
+              },
+            },
+          },
+          {
+            $project: {
+              nom: 1,
+              prenom: 1,
+              username: 1,
+            },
+          },
+        ],
+        as: "team.schoolInfo",
+      },
+    },
+    {
+      $unwind: "$team.schoolInfo",
+    },
+    {
+      $project: {
+        team: {
+          _id: "$team._id",
+          id_agent: "$team.schoolInfo._id",
+          nom: "$team.schoolInfo.nom",
+          prenom: "$team.schoolInfo.prenom",
+          username: "$team.schoolInfo.username",
+          type: "$team.agents.type",
+          engin: "$team.engin",
+          date: "$calendrier.date",
+          disponibilite: "$team.disponibilite",
+          gps_coordonnee: "$team.gps_coordonnee",
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "engins",
+        let: {
+          engin: "$team.engin",
+        },
+        pipeline: [{
+            $match: {
+              $expr: {
+                $eq: ["$_id", "$$engin"],
+              },
+            },
+          },
+          {
+            $project: {
+              code_name: 1,
+              matricule: 1,
+              _id: 0,
+            },
+          },
+        ],
+        as: "team.engin",
+      },
+    },
+    {
+      $unwind: "$team.engin",
+    },
+    {
+      $group: {
+        _id: {
+          _id: "$team._id",
+          engin: "$team.engin",
+          date: "$team.date",
+          disponibilite: "$team.disponibilite",
+          gps_coordonnee: "$team.gps_coordonnee",
+        },
+        agents: {
+          $push: {
+            id_agent: "$team.id_agent",
+            nom: "$team.nom",
+            prenom: "$team.prenom",
+            username: "$team.username",
+            type: "$team.type",
+          },
+        },
+
+      },
+    },
+    {
+      $project: {
+        _id: "$_id._id",
+        engin: "$_id.engin",
+        date: "$_id.date",
+        disponibilite: "$_id.disponibilite",
+        gps_coordonnee: "$_id.gps_coordonnee",
+        agents: "$agents",
+      },
+    },
+  ]);
+
+  var data = team[0]
+  res.status(200).json(data);
+});

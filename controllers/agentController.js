@@ -11,20 +11,58 @@ const {
 } = (mongoose = require("mongoose"));
 
 exports.getAgent = catchAsync(async (req, res, next) => {
-    const agent = await Agent.findOne({
-        id_unite: req.agent.id_unite,
-        _id: req.body.id_agent
-    });
+    var agent;
+    if(req.body.idAgent){
+        agent = await Agent.findOne({
+                        id_unite: req.agent.id_unite,
+                        _id: req.body.idAgent
+                    });
 
-    if (!agent) {
-        return next(
-            new AppError("Agent n'existe pas", 403)
-        )
+        if (!agent) {
+            return next(
+                new AppError("Agent n'existe pas", 403)
+            )
+        }
+    
+        
+        res.status(200).json({
+            status: "success",
+            agent,
+        })
+
+    }else if(req.params.id){//this modification is for the android use
+        console.log("coco1"+ req.params.id)
+        
+
+        agent = await Agent.findOne({
+                                //id_unite: req.agent.id_unite,
+                                _id: req.params.id
+                                    });
+
+        console.log("coco1"+ agent)
+        if (!agent) {
+            return next(
+                new AppError("Agent n'existe pas", 403)
+            )
+        }
+
+        
+
+        
+    
+        
+        res.status(200).json({
+            status: "success",
+            id_unite:agent.id_unite,
+            agent_id: agent._id,
+            agent_nom: agent.nom,
+            agent_role: agent.role,
+            agent_username: agent.username
+        })
+
     }
-    res.status(200).json({
-        status: "success",
-        agent,
-    })
+
+    
 });
 
 exports.getAllAgents = catchAsync(async (req, res) => {

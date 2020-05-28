@@ -12,6 +12,7 @@ router
     .post('/team/setAdresseTeam', authController.protect, teamController.setAdresseTeam)
 
     .post('/team/getTeamsDisponible', authController.protect, teamController.getTeamsDisponible)
+    .get('/team/:id?',authController.protect,teamController.getTeamAndroid)
 
 
 module.exports = router;
