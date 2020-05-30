@@ -31,7 +31,7 @@ exports.getAgent = catchAsync(async (req, res, next) => {
         })
 
     }else if(req.params.id){//this modification is for the android use
-        console.log("coco1"+ req.params.id)
+        
         
 
         agent = await Agent.findOne({
@@ -39,7 +39,7 @@ exports.getAgent = catchAsync(async (req, res, next) => {
                                 _id: req.params.id
                                     });
 
-        console.log("coco1"+ agent)
+        
         if (!agent) {
             return next(
                 new AppError("Agent n'existe pas", 403)

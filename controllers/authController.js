@@ -93,6 +93,7 @@ exports.protect = catchAsync(async (req, res, next) => {
         token = req.headers.authorization;
     }
 
+    console.log(token);
     
 
 
