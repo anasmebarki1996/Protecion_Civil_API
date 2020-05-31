@@ -114,8 +114,6 @@ exports.protect = catchAsync(async (req, res, next) => {
 
 exports.restricTo = (...roles) => {
     return (req, res, next) => {
-        console.log(roles)
-        console.log(roles.includes(req.agent.role))
         if (!roles.includes(req.agent.role)) {
             return next(
                 new AppError("Vous n'avez pas la permission", 403)

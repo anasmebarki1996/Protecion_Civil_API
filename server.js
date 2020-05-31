@@ -23,11 +23,11 @@ const limiter = rateLimit({
 app.use(cors());
 app.use(helmet());
 
-// process.on("uncaughtException", (err) => {
-//   console.log(err.name, err.message);
-//   console.log("UNHADLED REJECTION! Shuting down ...");
-//   process.exit(0);
-// });
+process.on("uncaughtException", (err) => {
+  console.log(err.name, err.message);
+  console.log("UNHADLED REJECTION! Shuting down ...");
+  process.exit(0);
+});
 
 dotenv.config({
   path: "./config.env",
@@ -105,7 +105,7 @@ app.use(globalErrorHandler);
 // ###################### FIN Routes ######################
 
 const PORT = process.env.PORT || 30001;
-const server = app.listen(PORT, process.env.LOCALHOST, function () {
+const server = app.listen(PORT, '0.0.0.0', function () {
   console.log("Server is running on : " + process.env.LOCALHOST + ":" + PORT);
 });
 

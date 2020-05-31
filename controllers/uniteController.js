@@ -12,7 +12,7 @@ exports.createUnite = catchAsync(async (req, res, next) => {
     await Unite.create({
         nom: req.body.nom,
         adresse: {
-            willaya: req.body.adresse.willaya,
+            wilaya: req.body.adresse.wilaya,
             daira: req.body.adresse.daira,
             adresse_rue: req.body.adresse.adresse_rue,
             gps_coordonnee: {
@@ -77,7 +77,7 @@ exports.updateInformationUnite = catchAsync(async (req, res, next) => {
         $set: {
             nom: req.body.nom,
             adresse: {
-                willaya: req.body.willaya,
+                wilaya: req.body.wilaya,
                 daira: req.body.daira,
                 adresse_rue: req.body.adresse_rue,
                 gps_coordonnee: {
@@ -121,6 +121,7 @@ exports.getUnitePlusProche = catchAsync(async (req, res, next) => {
                 $gte: req.body.lng - distance,
                 $lte: req.body.lng + distance,
             },
+            type: "secondaire"
         }, {
             _id: 1,
         });

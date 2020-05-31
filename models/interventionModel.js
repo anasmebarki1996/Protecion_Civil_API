@@ -27,6 +27,7 @@ const interventionSchema = new mongoose.Schema({
       },
     },
   },
+  // cco agent de l'unite principale   
   cco_agent_principale: {
     type: mongoose.Schema.ObjectId,
     ref: "Agent",
@@ -35,6 +36,11 @@ const interventionSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Agent",
   },
+  id_unite_principale: {
+    type: mongoose.Schema.ObjectId,
+    ref: "Unite",
+  },
+  // unite secondaire 
   id_unite: {
     type: mongoose.Schema.ObjectId,
     ref: "Unite",
@@ -76,7 +82,17 @@ const interventionSchema = new mongoose.Schema({
     },
     dateTimeDepart: {
       type: Date,
-    }
+    },
+    gps_coordonnee: {
+      lat: {
+        type: Number,
+        required: [true, "Vous devez saisir le lat"],
+      },
+      lng: {
+        type: Number,
+        required: [true, "Vous devez saisir la lng"],
+      },
+    },
   },
   // dateTimeFin == l'heure de la fin des traitement , sois ki youwasslou l'hopital sois ki ykamlou traitement nta3houm
   dateTimeFin: {

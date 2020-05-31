@@ -8,9 +8,9 @@ const UniteSchema = new mongoose.Schema({
         unique: [true, "cette unité existe déja"],
     },
     adresse: {
-        willaya: {
+        wilaya: {
             type: String,
-            required: [true, "le champ willaya est obligatoire"]
+            required: [true, "le champ wilaya est obligatoire"]
         },
         daira: {
             type: String,

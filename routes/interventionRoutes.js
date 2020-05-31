@@ -15,6 +15,7 @@ router
     .get('/intervention/getAllIntervention_name', authController.protect, authController.checkUnite, interventionController.getAllIntervention_name)
     .post('/intervention/envoyerIntervention', authController.protect, interventionController.envoyerIntervention)
     .post('/intervention/envoyerInterventionAuChef', authController.protect, interventionController.envoyerInterventionAuChef)
+    .post('/intervention/getIntervention_details', authController.protect, authController.restricTo('cco_agent', 'admin'), interventionController.getIntervention_details)
 
 
 

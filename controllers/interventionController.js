@@ -1,4 +1,5 @@
 const Intervention = require("./../models/interventionModel");
+const Planning = require("./../models/planningModel");
 const Appel = require("./../models/appelModel");
 const Unite = require("./../models/uniteModel");
 const catchAsync = require("../utils/catchAsync");
@@ -252,7 +253,6 @@ exports.getAllIntervention_EnCours = catchAsync(async (req, res) => {
 
 
 exports.envoyerIntervention = catchAsync(async (req, res, next) => {
-  console.log("envoyerIntervention : manque id_node + description");
 
   await Intervention.create({
     numTel: req.body.numTel,
@@ -267,6 +267,7 @@ exports.envoyerIntervention = catchAsync(async (req, res, next) => {
     },
     cco_agent: req.agent._id,
     id_unite: req.agent.id_unite,
+    id_unite_principale: req.agent.id_unite,
     id_node: req.body.id_node,
     dateTimeAppel: dateTime,
     statut: "envoye",
@@ -306,5 +307,223 @@ exports.envoyerInterventionAuChef = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     intervention
+  });
+});
+
+
+exports.getIntervention_details = catchAsync(async (req, res, next) => {
+  let intervention = await Intervention.aggregate([{
+      $match: {
+        _id: ObjectId(req.body.id_intervention),
+      }
+    },
+    {
+      $lookup: {
+        from: "unites",
+        let: {
+          id_unite: "$id_unite",
+        },
+        pipeline: [{
+          $match: {
+            $expr: {
+              $eq: ["$_id", "$$id_unite"],
+            },
+          },
+        }, ],
+        as: "unite_secondaire",
+      },
+    },
+    {
+      $unwind: "$unite_secondaire"
+    },
+    {
+      $lookup: {
+        from: "unites",
+        let: {
+          id_unite: "$id_unite_principale",
+        },
+        pipeline: [{
+          $match: {
+            $expr: {
+              $eq: ["$_id", "$$id_unite"],
+            },
+          },
+        }, ],
+        as: "unite_principale",
+      },
+    },
+    {
+      $unwind: "$unite_principale"
+    },
+    {
+      $lookup: {
+        from: "agents",
+        let: {
+          id_agent: "$cco_agent_principale",
+        },
+        pipeline: [{
+          $match: {
+            $expr: {
+              $eq: ["$_id", "$$id_agent"],
+            },
+          },
+        }, {
+          $project: {
+            nom: 1,
+            prenom: 1,
+            _id: 0,
+          },
+        }],
+        as: "cco_agent_principale",
+      },
+    },
+    {
+      $unwind: "$cco_agent_principale"
+    },
+    {
+      $lookup: {
+        from: "agents",
+        let: {
+          id_agent: "$cco_agent_secondaire",
+        },
+        pipeline: [{
+          $match: {
+            $expr: {
+              $eq: ["$_id", "$$id_agent"],
+            },
+          },
+        }, {
+          $project: {
+            nom: 1,
+            prenom: 1,
+            _id: 0,
+          },
+        }, ],
+        as: "cco_agent_secondaire",
+      },
+    },
+    {
+      $unwind: "$cco_agent_secondaire"
+    },
+  ]);
+
+  const team = await Planning.aggregate([{
+      $unwind: "$calendrier",
+    },
+    {
+      $unwind: "$calendrier.team",
+    },
+    {
+      $match: {
+        id_unite: ObjectId(req.agent.id_unite),
+        "calendrier.team._id": ObjectId(intervention[0].id_team),
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        team: "$calendrier.team",
+      },
+    },
+    {
+      $unwind: "$team.agents",
+    },
+    {
+      $lookup: {
+        from: "agents",
+        let: {
+          agent: "$team.agents.agent",
+        },
+        pipeline: [{
+            $match: {
+              $expr: {
+                $eq: ["$_id", "$$agent"],
+              },
+            },
+          },
+          {
+            $project: {
+              nom: 1,
+              prenom: 1,
+              username: 1,
+            },
+          },
+        ],
+        as: "team.schoolInfo",
+      },
+    },
+    {
+      $unwind: "$team.schoolInfo",
+    },
+    {
+      $project: {
+        team: {
+          _id: "$team._id",
+          id_agent: "$team.schoolInfo._id",
+          nom: "$team.schoolInfo.nom",
+          prenom: "$team.schoolInfo.prenom",
+          type: "$team.agents.type",
+          engin: "$team.engin",
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "engins",
+        let: {
+          engin: "$team.engin",
+        },
+        pipeline: [{
+            $match: {
+              $expr: {
+                $eq: ["$_id", "$$engin"],
+              },
+            },
+          },
+          {
+            $project: {
+              code_name: 1,
+              matricule: 1,
+              _id: 0,
+            },
+          },
+        ],
+        as: "team.engin",
+      },
+    },
+    {
+      $unwind: "$team.engin",
+    },
+    {
+      $group: {
+        _id: {
+          _id: "$team._id",
+          engin: "$team.engin",
+        },
+        agents: {
+          $push: {
+            id_agent: "$team.id_agent",
+            nom: "$team.nom",
+            prenom: "$team.prenom",
+            username: "$team.username",
+            type: "$team.type",
+          },
+        },
+
+      },
+    },
+    {
+      $project: {
+        _id: "$_id._id",
+        engin: "$_id.engin",
+        agents: "$agents",
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    status: "success",
+    intervention: intervention[0],
+    team: team[0]
   });
 });
