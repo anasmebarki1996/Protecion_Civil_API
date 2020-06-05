@@ -5,6 +5,7 @@ const catchAsync = require("../utils/catchAsync");
 const dateTime = require("../utils/moment").dateTime;
 const APIFeatures = require("../utils/apiFeatures");
 const AppError = require("../utils/appError");
+const io = require("../socket").io
 const {
   Types: {
     ObjectId
@@ -303,8 +304,112 @@ exports.envoyerInterventionAuChef = catchAsync(async (req, res, next) => {
     }
   });
 
+  io.emit("interventionStart", req.body.id_team, req.body.id_intervention)
+
   res.status(200).json({
     status: "success",
     intervention
   });
 });
+
+
+
+exports.getInterventionByChef = catchAsync(async (req, res, next) => {
+  const id_team = req.params.id_team;
+  const intervention = await Intervention.findOne({
+    id_team: id_team,
+    statut: {
+      $ne: "termine"
+    }
+  })
+
+  if (!intervention) {
+    return next(new AppError("intervention non disponible", 403));
+  }
+
+
+
+
+
+  res.status(200).json(intervention);
+});
+
+
+exports.updateInterventionStatus = catchAsync(async (req, res, next) => {
+
+
+  const id_intervention = req.params.id_intervention;
+
+
+
+  await Intervention.findOneAndUpdate({
+    _id: id_intervention
+  }, {
+    statut: req.body.statut
+  })
+
+  const intervention = await Intervention.findOne({
+    _id: id_intervention
+  });
+
+
+  if (!intervention) {
+    return next(new AppError("intervention non disponible", 403));
+  }
+
+
+
+  res.status(200).json(intervention);
+
+
+
+})
+
+
+exports.updateInterventionByChef = catchAsync(async (req, res, next) => {
+  const id_intervention = req.params.id_intervention;
+
+  if (req.body.dateTimeDepart == "now()")
+    req.body.dateTimeDepart = dateTime
+
+  if (req.body.dateTimeArrive == "now()")
+    req.body.dateTimeArrive = dateTime
+
+  if (req.body.transfere.dateTimeDepart == "now()")
+    req.body.transfere.dateTimeDepart = dateTime
+
+  if (req.body.dateTimeFin == "now()")
+    req.body.dateTimeFin = dateTime
+
+
+    
+
+  await Intervention.findOneAndUpdate({
+    _id: id_intervention
+
+  }, req.body)
+
+  const intervention = await Intervention.findOne({
+    _id: id_intervention
+  });
+
+  if (!intervention) {
+    return next(new AppError("intervention non disponible", 403));
+  }
+
+  res.status(200).json(intervention);
+});
+
+
+exports.test = catchAsync(async (req, res, next) => {
+
+  io.emit("interventionStart", "5e99c95440c1d62ca8ee7906", "5ecdf0b56e77fd030ca168af")
+
+  res.status(200).json({
+    status: "success",
+
+  });
+
+
+
+})

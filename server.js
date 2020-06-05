@@ -18,6 +18,11 @@ const limiter = rateLimit({
   message: "Too many requests from this IP,please try again in an hour !",
 });
 
+var http = require("http").Server(app);
+module.exports = {
+  http
+};
+
 // app.use("/API", limiter);
 // set security HTTP headers
 app.use(cors());
@@ -96,6 +101,10 @@ app.use("/API/", teamRoutes);
 app.use("/API/", uniteRoutes);
 app.use("/API/", enginRoutes);
 
+/*app.use(require('./socket.js').router);
+const io = require("./socket.js").io;
+io.emit("test");
+*/
 app.all("*", (req, res, next) => {
   next(new appError(`Can't find ${req.originalUrl} on this server`, 404));
 });
@@ -105,9 +114,15 @@ app.use(globalErrorHandler);
 // ###################### FIN Routes ######################
 
 const PORT = process.env.PORT || 30001;
-const server = app.listen(PORT, process.env.LOCALHOST, function () {
+const server = http.listen(PORT, process.env.LOCALHOST, function () {
   console.log("Server is running on : " + process.env.LOCALHOST + ":" + PORT);
 });
+
+/*
+module.exports = {
+  server
+};*/
+
 
 process.on("unhandledRejection", (err) => {
   console.log(err.name, err.message);
@@ -116,3 +131,4 @@ process.on("unhandledRejection", (err) => {
     process.exit(0);
   });
 });
+

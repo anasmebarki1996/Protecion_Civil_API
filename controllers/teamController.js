@@ -415,6 +415,8 @@ else
 exports.getTeamAndroid = catchAsync(async (req, res, next) => {
 
   const team_id = req.params.id || await getTeamId(req.agent)
+
+  console.log(team_id);
   
   
   

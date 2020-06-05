@@ -14,4 +14,5 @@ router
     .post('/updateCompteAgent', authController.protect, agentController.updateCompteAgent)
     .post('/updatePasswordAgent', authController.protect, agentController.updatePasswordAgent)
 
+
 module.exports = router;

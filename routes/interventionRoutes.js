@@ -16,6 +16,10 @@ router
     .post('/intervention/envoyerIntervention', authController.protect, interventionController.envoyerIntervention)
     .post('/intervention/envoyerInterventionAuChef', authController.protect, interventionController.envoyerInterventionAuChef)
 
-
+    .get("/intervention/getInterventionByChef/:id_team?",interventionController.getInterventionByChef)
+    .post("/intervention/updateInterventionByChef/:id_intervention",interventionController.updateInterventionByChef)
+    .post("/intervention/updateInterventionStatus/:id_intervention",interventionController.updateInterventionStatus)
+    .get("/test",interventionController.test)
+    
 
 module.exports = router;
