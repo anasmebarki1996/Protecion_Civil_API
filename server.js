@@ -123,14 +123,15 @@ app.use(globalErrorHandler);
 // ###################### FIN Routes ######################
 
 const PORT = process.env.PORT || 30001;
-const server = http.listen(PORT, '0.0.0.0', function () {
+const server = http.listen(PORT, "0.0.0.0", function () {
   console.log("Server is running on : " + process.env.LOCALHOST + ":" + PORT);
 });
 
-// process.on("unhandledRejection", (err) => {
-//   console.log(err.name, err.message);
-//   console.log("UNHADLED REJECTION! Shuting down ...");
-//   server.close(() => {
-//     process.exit(0);
-//   });
-// });
+
+process.on("unhandledRejection", (err) => {
+  console.log(err.name, err.message);
+  console.log("UNHADLED REJECTION! Shuting down ...");
+  server.close(() => {
+    process.exit(0);
+  });
+});

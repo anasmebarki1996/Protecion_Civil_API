@@ -302,6 +302,7 @@ exports.envoyerInterventionAuChef = catchAsync(async (req, res, next) => {
 
   io.emit("interventionStart", req.body.id_team, req.body.id_intervention)
 
+
   res.status(200).json({
     status: "success",
     intervention
@@ -530,7 +531,7 @@ exports.getInterventionByChef = catchAsync(async (req, res, next) => {
   const intervention = await Intervention.findOne({
     id_team: id_team,
     statut: {
-      $ne: "termine"
+      $nin: ["envoye", "annule", "termine"]
     }
   })
 
@@ -568,7 +569,6 @@ exports.updateInterventionStatus = catchAsync(async (req, res, next) => {
   }
 
 
-
   res.status(200).json(intervention);
 
 
@@ -593,8 +593,6 @@ exports.updateInterventionByChef = catchAsync(async (req, res, next) => {
 
   console.log("transfer :" + req.body.transfere.hospital)
 
-
-
   await Intervention.findOneAndUpdate({
     _id: id_intervention
 
@@ -607,6 +605,8 @@ exports.updateInterventionByChef = catchAsync(async (req, res, next) => {
   if (!intervention) {
     return next(new AppError("intervention non disponible", 403));
   }
+
+  io.emit("interventionStatusChange", id_intervention)
 
   res.status(200).json(intervention);
 });
