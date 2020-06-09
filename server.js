@@ -105,6 +105,7 @@ app.use("/API/", planningRoutes);
 app.use("/API/", teamRoutes);
 app.use("/API/", uniteRoutes);
 app.use("/API/", enginRoutes);
+app.use("/API/", hospitalRoutes);
 app.use(require('./socket.js').router);
 const io = require("./socket.js").io;
 io.emit("test");
