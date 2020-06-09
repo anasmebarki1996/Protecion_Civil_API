@@ -71,8 +71,9 @@ const interventionSchema = new mongoose.Schema({
   },
   // si il y a un transfere vers l'hopital par exemple et le temps d'arrivé a l'hopital = temps fin
   transfere: {
-    lieu: {
-      type: String,
+    hospital:{
+      type: mongoose.Schema.ObjectId,
+      ref: "Hospital",
     },
     dateTimeDepart: {
       type: Date,

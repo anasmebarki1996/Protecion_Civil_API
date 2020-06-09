@@ -382,6 +382,8 @@ exports.updateInterventionByChef = catchAsync(async (req, res, next) => {
     req.body.dateTimeFin = dateTime
 
 
+    console.log("transfer :"+req.body.transfere.hospital)
+
     
 
   await Intervention.findOneAndUpdate({

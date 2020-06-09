@@ -90,6 +90,7 @@ const planningRoutes = require("./routes/planningRoutes");
 const teamRoutes = require("./routes/teamRoutes");
 const uniteRoutes = require("./routes/uniteRoutes");
 const enginRoutes = require("./routes/enginRoutes");
+const hospitalRoutes = require("./routes/hospitalRoutes");
 app.use("/API/", authRoutes);
 app.use("/API/", agentRoutes);
 app.use("/API/", interventionRoutes);
@@ -100,6 +101,7 @@ app.use("/API/", planningRoutes);
 app.use("/API/", teamRoutes);
 app.use("/API/", uniteRoutes);
 app.use("/API/", enginRoutes);
+app.use("/API/", hospitalRoutes);
 
 /*app.use(require('./socket.js').router);
 const io = require("./socket.js").io;
