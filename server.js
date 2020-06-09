@@ -1,5 +1,9 @@
 const express = require("express");
 const app = express();
+var http = require("http").Server(app);
+module.exports = {
+  http
+};
 const morgan = require("morgan");
 var bodyParser = require("body-parser");
 const dotenv = require("dotenv");
@@ -23,11 +27,11 @@ const limiter = rateLimit({
 app.use(cors());
 app.use(helmet());
 
-process.on("uncaughtException", (err) => {
-  console.log(err.name, err.message);
-  console.log("UNHADLED REJECTION! Shuting down ...");
-  process.exit(0);
-});
+// process.on("uncaughtException", (err) => {
+//   console.log(err.name, err.message);
+//   console.log("UNHADLED REJECTION! Shuting down ...");
+//   process.exit(0);
+// });
 
 dotenv.config({
   path: "./config.env",
@@ -95,6 +99,10 @@ app.use("/API/", planningRoutes);
 app.use("/API/", teamRoutes);
 app.use("/API/", uniteRoutes);
 app.use("/API/", enginRoutes);
+app.use(require('./socket.js').router);
+const io = require("./socket.js").io;
+io.emit("test");
+
 
 app.all("*", (req, res, next) => {
   next(new appError(`Can't find ${req.originalUrl} on this server`, 404));
@@ -105,14 +113,14 @@ app.use(globalErrorHandler);
 // ###################### FIN Routes ######################
 
 const PORT = process.env.PORT || 30001;
-const server = app.listen(PORT, '0.0.0.0', function () {
+const server = http.listen(PORT, '0.0.0.0', function () {
   console.log("Server is running on : " + process.env.LOCALHOST + ":" + PORT);
 });
 
-process.on("unhandledRejection", (err) => {
-  console.log(err.name, err.message);
-  console.log("UNHADLED REJECTION! Shuting down ...");
-  server.close(() => {
-    process.exit(0);
-  });
-});
+// process.on("unhandledRejection", (err) => {
+//   console.log(err.name, err.message);
+//   console.log("UNHADLED REJECTION! Shuting down ...");
+//   server.close(() => {
+//     process.exit(0);
+//   });
+// });

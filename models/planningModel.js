@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 const date = require("../utils/moment").date;
 const dateTime = require("../utils/moment").dateTime;
-const validator = require("validator");
-const bcrypt = require("bcrypt");
 
 const planningSchema = new mongoose.Schema({
     id_unite: {
