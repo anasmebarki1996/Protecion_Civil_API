@@ -6,6 +6,7 @@ const catchAsync = require("../utils/catchAsync");
 const dateTime = require("../utils/moment").dateTime;
 const APIFeatures = require("../utils/apiFeatures");
 const AppError = require("../utils/appError");
+const io = require("../socket").io
 const {
   Types: {
     ObjectId
@@ -16,7 +17,7 @@ exports.getAllIntervention = catchAsync(async (req, res, next) => {
 
   var date = new Date(req.body.date);
   if (!req.body.date || !(date instanceof Date) || isNaN(date.valueOf())) {
-    return next(new AppError("Veuilliez vous verifier la date", 403));
+    return next(new AppError("Veuillez-vous verifier la date", 403));
   }
   var start = new Date(req.body.date);
   start.setHours(0);
@@ -64,8 +65,6 @@ exports.getAllIntervention = catchAsync(async (req, res, next) => {
     interventions_total: interventions.length,
   });
 });
-
-
 
 exports.getAllIntervention_name = catchAsync(async (req, res) => {
   // EXECUTE QUERY
@@ -175,8 +174,6 @@ exports.addDateTimeDepart = catchAsync(async (req, res) => {
   });
 });
 
-
-
 exports.getAllIntervention_Envoye = catchAsync(async (req, res) => {
   // EXECUTE QUERY
   let features, interventions = [];
@@ -230,7 +227,7 @@ exports.getAllIntervention_EnCours = catchAsync(async (req, res) => {
       _id: 1,
     });
     let unite = unites.map((x) => ObjectId(x._id));
-    interventions = intervention.where({
+    interventions = Intervention.where({
       id_unite: {
         $in: unite,
       },
@@ -250,7 +247,6 @@ exports.getAllIntervention_EnCours = catchAsync(async (req, res) => {
     interventions_total: interventions.length,
   });
 });
-
 
 exports.envoyerIntervention = catchAsync(async (req, res, next) => {
 
@@ -304,12 +300,13 @@ exports.envoyerInterventionAuChef = catchAsync(async (req, res, next) => {
     }
   });
 
+  io.emit("interventionStart", req.body.id_team, req.body.id_intervention)
+
   res.status(200).json({
     status: "success",
     intervention
   });
 });
-
 
 exports.getIntervention_details = catchAsync(async (req, res, next) => {
   let intervention = await Intervention.aggregate([{
@@ -527,3 +524,102 @@ exports.getIntervention_details = catchAsync(async (req, res, next) => {
     team: team[0]
   });
 });
+
+exports.getInterventionByChef = catchAsync(async (req, res, next) => {
+  const id_team = req.params.id_team;
+  const intervention = await Intervention.findOne({
+    id_team: id_team,
+    statut: {
+      $ne: "termine"
+    }
+  })
+
+  if (!intervention) {
+    return next(new AppError("intervention non disponible", 403));
+  }
+
+
+
+
+
+  res.status(200).json(intervention);
+});
+
+exports.updateInterventionStatus = catchAsync(async (req, res, next) => {
+
+
+  const id_intervention = req.params.id_intervention;
+
+
+
+  await Intervention.findOneAndUpdate({
+    _id: id_intervention
+  }, {
+    statut: req.body.statut
+  })
+
+  const intervention = await Intervention.findOne({
+    _id: id_intervention
+  });
+
+
+  if (!intervention) {
+    return next(new AppError("intervention non disponible", 403));
+  }
+
+
+
+  res.status(200).json(intervention);
+
+
+
+})
+
+exports.updateInterventionByChef = catchAsync(async (req, res, next) => {
+  const id_intervention = req.params.id_intervention;
+
+  if (req.body.dateTimeDepart == "now()")
+    req.body.dateTimeDepart = dateTime
+
+  if (req.body.dateTimeArrive == "now()")
+    req.body.dateTimeArrive = dateTime
+
+  if (req.body.transfere.dateTimeDepart == "now()")
+    req.body.transfere.dateTimeDepart = dateTime
+
+  if (req.body.dateTimeFin == "now()")
+    req.body.dateTimeFin = dateTime
+
+
+  console.log("transfer :" + req.body.transfere.hospital)
+
+
+
+  await Intervention.findOneAndUpdate({
+    _id: id_intervention
+
+  }, req.body)
+
+  const intervention = await Intervention.findOne({
+    _id: id_intervention
+  });
+
+  if (!intervention) {
+    return next(new AppError("intervention non disponible", 403));
+  }
+
+  res.status(200).json(intervention);
+});
+
+exports.test = catchAsync(async (req, res, next) => {
+
+  io.emit("interventionStart", "5e99c95440c1d62ca8ee7906", "5ecdf0b56e77fd030ca168af")
+
+  res.status(200).json({
+    status: "success",
+
+  });
+
+
+
+})

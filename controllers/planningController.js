@@ -186,13 +186,13 @@ exports.getPlanning = catchAsync(async (req, res, next) => {
 exports.addTeam = catchAsync(async (req, res, next) => {
   // verification
   if (!req.body.agents.length) {
-    return next(new AppError("Veuilliez vous introduire les agents ", 403));
+    return next(new AppError("Veuillez-vous introduire les agents ", 403));
   }
   if (!req.body.engin) {
-    return next(new AppError("Veuilliez vous introduire l'engin", 403));
+    return next(new AppError("Veuillez-vous introduire l'engin", 403));
   }
   if (!req.body.date) {
-    return next(new AppError("Veuilliez vous introduire la date", 403));
+    return next(new AppError("Veuillez-vous introduire la date", 403));
   }
 
   // #################
@@ -208,7 +208,7 @@ exports.addTeam = catchAsync(async (req, res, next) => {
       req.body.agents[i].agent = agent._id;
     } else {
       return next(
-        new AppError("Veuilliez vous vérifier la liste des agents", 403)
+        new AppError("Veuillez-vous vérifier la liste des agents", 403)
       );
     }
   }
@@ -219,7 +219,7 @@ exports.addTeam = catchAsync(async (req, res, next) => {
 
   if (!engin) {
     return next(
-      new AppError("Veuilliez vous vérifier le matricule d'engin", 403)
+      new AppError("Veuillez-vous vérifier le matricule d'engin", 403)
     );
   }
 
@@ -274,7 +274,7 @@ exports.deleteTeam = catchAsync(async (req, res, next) => {
   // verification
 
   if (!req.body.id_team) {
-    return next(new AppError("Veuilliez vous acctualiser la page", 403));
+    return next(new AppError("Veuillez-vous acctualiser la page", 403));
   }
 
   await Planning.findOneAndUpdate({
@@ -307,10 +307,10 @@ exports.addChauffeur = catchAsync(async (req, res, next) => {
   // verification
 
   if (!req.body.id_team) {
-    return next(new AppError("Veuilliez vous acctualiser la page", 403));
+    return next(new AppError("Veuillez-vous acctualiser la page", 403));
   }
   if (!req.body.chauffeur) {
-    return next(new AppError("Veuilliez vous verifier le chauffeur", 403));
+    return next(new AppError("Veuillez-vous verifier le chauffeur", 403));
   }
 
   // #################
@@ -325,7 +325,7 @@ exports.addChauffeur = catchAsync(async (req, res, next) => {
     },
     (err, doc) => {
       if (err) {
-        return next(new AppError("Veuilliez vous acctualiser la page", 403));
+        return next(new AppError("Veuillez-vous acctualiser la page", 403));
       }
       if (doc) {
         return next(new AppError("Le chauffeur existe déja", 403));
@@ -339,7 +339,7 @@ exports.addChauffeur = catchAsync(async (req, res, next) => {
     (err, doc) => {
       if (err || !doc) {
         return next(
-          new AppError("Veuilliez vous vérifier la liste des agents", 403)
+          new AppError("Veuillez-vous vérifier la liste des agents", 403)
         );
       }
     }
@@ -411,10 +411,10 @@ exports.addChef = catchAsync(async (req, res, next) => {
   // verification
 
   if (!req.body.id_team) {
-    return next(new AppError("Veuilliez vous acctualiser la page", 403));
+    return next(new AppError("Veuillez-vous acctualiser la page", 403));
   }
   if (!req.body.chef) {
-    return next(new AppError("Veuilliez vous verifier le chef d'agrés", 403));
+    return next(new AppError("Veuillez-vous verifier le chef d'agrés", 403));
   }
 
   // #################
@@ -430,7 +430,7 @@ exports.addChef = catchAsync(async (req, res, next) => {
     (err, doc) => {
       if (err) {
         return next(
-          new AppError("Veuilliez vous vérifier la liste des agents", 403)
+          new AppError("Veuillez-vous vérifier la liste des agents", 403)
         );
       }
       if (doc) {
@@ -445,7 +445,7 @@ exports.addChef = catchAsync(async (req, res, next) => {
     (err, doc) => {
       if (err || !doc) {
         return next(
-          new AppError("Veuilliez vous vérifier la liste des agents", 403)
+          new AppError("Veuillez-vous vérifier la liste des agents", 403)
         );
       }
     }
@@ -516,10 +516,10 @@ exports.addEngin = catchAsync(async (req, res, next) => {
   // verification
 
   if (!req.body.id_team) {
-    return next(new AppError("Veuilliez vous acctualiser la page", 403));
+    return next(new AppError("Veuillez-vous acctualiser la page", 403));
   }
   if (!req.body.enign) {
-    return next(new AppError("Veuilliez vous verifier l'engin'", 403));
+    return next(new AppError("Veuillez-vous verifier l'engin'", 403));
   }
 
   // #################
@@ -548,7 +548,7 @@ exports.addEngin = catchAsync(async (req, res, next) => {
     (err, doc) => {
       if (err || !doc) {
         return next(
-          new AppError("Veuilliez vous vérifier la liste des engins", 403)
+          new AppError("Veuillez-vous vérifier la liste des engins", 403)
         );
       }
     }
@@ -613,10 +613,10 @@ exports.addSecours = catchAsync(async (req, res, next) => {
   // verification
 
   if (!req.body.id_team) {
-    return next(new AppError("Veuilliez vous acctualiser la page", 403));
+    return next(new AppError("Veuillez-vous acctualiser la page", 403));
   }
   if (!req.body.secours) {
-    return next(new AppError("Veuilliez vous verifier le secours", 403));
+    return next(new AppError("Veuillez-vous verifier le secours", 403));
   }
 
   // #################
@@ -626,7 +626,7 @@ exports.addSecours = catchAsync(async (req, res, next) => {
     (err, doc) => {
       if (err || !doc) {
         return next(
-          new AppError("Veuilliez vous vérifier la liste des agents", 403)
+          new AppError("Veuillez-vous vérifier la liste des agents", 403)
         );
       }
     }
@@ -645,7 +645,7 @@ exports.addSecours = catchAsync(async (req, res, next) => {
     (err, doc) => {
       if (err) {
         return next(
-          new AppError("Veuilliez vous vérifier la liste des agents", 403)
+          new AppError("Veuillez-vous vérifier la liste des agents", 403)
         );
       }
       if (doc) {
@@ -688,10 +688,10 @@ exports.deleteSecours = catchAsync(async (req, res, next) => {
   // verification
 
   if (!req.body.id_team) {
-    return next(new AppError("Veuilliez vous acctualiser la page", 403));
+    return next(new AppError("Veuillez-vous acctualiser la page", 403));
   }
   if (!req.body.secours) {
-    return next(new AppError("Veuilliez vous verifier le secours", 403));
+    return next(new AppError("Veuillez-vous verifier le secours", 403));
   }
 
   // #################
@@ -701,7 +701,7 @@ exports.deleteSecours = catchAsync(async (req, res, next) => {
     (err, doc) => {
       if (err || !doc) {
         return next(
-          new AppError("Veuilliez vous vérifier la liste des agents", 403)
+          new AppError("Veuillez-vous vérifier la liste des agents", 403)
         );
       }
     }
@@ -739,10 +739,10 @@ exports.deleteSecours = catchAsync(async (req, res, next) => {
 exports.updateDate = catchAsync(async (req, res, next) => {
   // verification
   if (!req.body.id_team) {
-    return next(new AppError("Veuilliez vous acctualiser la page", 403));
+    return next(new AppError("Veuillez-vous acctualiser la page", 403));
   }
   if (!req.body.date || !moment(req.body.date).isValid()) {
-    return next(new AppError("Veuilliez vous introduire la date", 403));
+    return next(new AppError("Veuillez-vous introduire la date", 403));
   }
   // #################
 

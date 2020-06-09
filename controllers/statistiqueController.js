@@ -11,17 +11,21 @@ const {
     ObjectId
   },
 } = (mongoose = require("mongoose"));
+
 exports.getInterventionStatistiques = catchAsync(async (req, res, next) => {
+  // étape pour  vérifier  le choix
   if (
     !req.body.choix ||
     !["quotidien", "mensuel", "annuel"].includes(req.body.choix)
   ) {
-    return next(new AppError("Veuilliez vous introduire le choix", 403));
+    return next(new AppError("Veuillez-vous introduire le choix", 403));
   }
+  // étape pour  vérifier  le data
   var date = new Date(req.body.date);
   if (!req.body.date || !(date instanceof Date) || isNaN(date.valueOf())) {
-    return next(new AppError("Veuilliez vous verifier la date", 403));
+    return next(new AppError("Veuillez-vous verifier la date", 403));
   }
+  // étape pour faire la durée
   var start = new Date(req.body.date);
   start.setHours(0);
   start.setMinutes(0);
@@ -39,6 +43,8 @@ exports.getInterventionStatistiques = catchAsync(async (req, res, next) => {
     start.setDate(1);
     end.setDate(31);
   }
+
+  // étape pour chercher les interventions de cette durée
   let interventions = [];
   interventions = Intervention.aggregate([{
     $match: {
@@ -48,6 +54,10 @@ exports.getInterventionStatistiques = catchAsync(async (req, res, next) => {
       },
     },
   }, ]);
+
+  // étape pour filtrer les interventions de l'unité 
+  // si l'unité est secondaire nous filtrons que ses interventions
+  // sinon nous filtrons tous les interventions de ses unites secondaires
   if (req.unite.type == "secondaire") {
     interventions = interventions.match({
       id_unite: ObjectId(req.agent.id_unite),
@@ -65,11 +75,14 @@ exports.getInterventionStatistiques = catchAsync(async (req, res, next) => {
       },
     });
   }
+
+  // si le filter de l'intervention est activé nous filterons que le node demandé
   if (req.body.id_node && req.body.id_node != "") {
     interventions = interventions.match({
       id_node: ObjectId(req.body.id_node),
     });
   }
+  // filter de choix quotidien , annuel ou mensuel 
   if (req.body.choix == "annuel") {
     interventions = interventions
       .group({
@@ -146,12 +159,10 @@ exports.getInterventionStatistiques = catchAsync(async (req, res, next) => {
   }
 
   interventions = interventions.sort("filter");
-
   interventions = await interventions.exec();
 
   // SEND RESPONSE
   res.status(200).json({
-    status: "success",
     interventions,
   });
 });
@@ -161,11 +172,11 @@ exports.getInterventionHeatMap = catchAsync(async (req, res, next) => {
     !req.body.choix ||
     !["quotidien", "mensuel", "annuel"].includes(req.body.choix)
   ) {
-    return next(new AppError("Veuilliez vous introduire le choix", 403));
+    return next(new AppError("Veuillez-vous introduire le choix", 403));
   }
   var date = new Date(req.body.date);
   if (!req.body.date || !(date instanceof Date) || isNaN(date.valueOf())) {
-    return next(new AppError("Veuilliez vous verifier la date", 403));
+    return next(new AppError("Veuillez-vous verifier la date", 403));
   }
   var start = new Date(req.body.date);
   start.setHours(0);
@@ -233,7 +244,7 @@ exports.getUnitesQuiALePlusDinterventionParMois = catchAsync(async (req, res, ne
   }
   var date = new Date(today);
   if (!req.body.date || !(date instanceof Date) || isNaN(date.valueOf())) {
-    return next(new AppError("Veuilliez vous verifier la date", 403));
+    return next(new AppError("Veuillez-vous verifier la date", 403));
   }
   var start = new Date(req.body.date);
   start.setHours(0);
@@ -318,7 +329,7 @@ exports.getMeilleureTempsDeReposnseParMois = catchAsync(async (req, res, next) =
   }
   var date = new Date(today);
   if (!req.body.date || !(date instanceof Date) || isNaN(date.valueOf())) {
-    return next(new AppError("Veuilliez vous verifier la date", 403));
+    return next(new AppError("Veuillez-vous verifier la date", 403));
   }
   var start = new Date(req.body.date);
   start.setHours(0);
@@ -408,11 +419,11 @@ exports.getStatistiques = catchAsync(async (req, res, next) => {
     !req.body.choix ||
     !["quotidien", "mensuel", "annuel"].includes(req.body.choix)
   ) {
-    return next(new AppError("Veuilliez vous introduire le choix", 403));
+    return next(new AppError("Veuillez-vous introduire le choix", 403));
   }
   var date = new Date(req.body.date);
   if (!req.body.date || !(date instanceof Date) || isNaN(date.valueOf())) {
-    return next(new AppError("Veuilliez vous verifier la date", 403));
+    return next(new AppError("Veuillez-vous verifier la date", 403));
   }
   var start = new Date(req.body.date);
   start.setHours(0);

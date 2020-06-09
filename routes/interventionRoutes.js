@@ -17,6 +17,10 @@ router
     .post('/intervention/envoyerInterventionAuChef', authController.protect, interventionController.envoyerInterventionAuChef)
     .post('/intervention/getIntervention_details', authController.protect, authController.restricTo('cco_agent', 'admin'), interventionController.getIntervention_details)
 
-
+    .get("/intervention/getInterventionByChef/:id_team?",interventionController.getInterventionByChef)
+    .post("/intervention/updateInterventionByChef/:id_intervention",interventionController.updateInterventionByChef)
+    .post("/intervention/updateInterventionStatus/:id_intervention",interventionController.updateInterventionStatus)
+    .get("/test",interventionController.test)
+    
 
 module.exports = router;
