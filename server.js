@@ -124,7 +124,10 @@ app.use(globalErrorHandler);
 // ###################### FIN Routes ######################
 
 const PORT = process.env.PORT || 30001;
-const server = http.listen(PORT, "0.0.0.0", function () {
+// const server = http.listen(PORT, "0.0.0.0", function () {
+//   console.log("Server is running on : " + process.env.LOCALHOST + ":" + PORT);
+// });
+const server = http.listen(PORT, process.env.LOCALHOST, function () {
   console.log("Server is running on : " + process.env.LOCALHOST + ":" + PORT);
 });
 

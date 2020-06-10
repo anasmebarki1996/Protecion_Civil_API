@@ -403,6 +403,22 @@ exports.getIntervention_details = catchAsync(async (req, res, next) => {
     {
       $unwind: "$cco_agent_secondaire"
     },
+    {
+      $lookup: {
+        from: "hospitals",
+        let: {
+          id_hospital: "$transfere.hospital",
+        },
+        pipeline: [{
+          $match: {
+            $expr: {
+              $eq: ["$_id", "$$id_hospital"],
+            },
+          },
+        }],
+        as: "transfere",
+      },
+    },
   ]);
 
   const team = await Planning.aggregate([{
