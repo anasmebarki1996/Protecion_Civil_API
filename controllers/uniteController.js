@@ -20,8 +20,9 @@ exports.createUnite = catchAsync(async (req, res, next) => {
                 lng: req.body.adresse.gps_coordonnee.lng,
             },
         },
-        type: req.body.type,
+        type: "secondaire",
         unite_principale: req.agent.id_unite,
+        numTel: req.body.numTel
     });
     res.status(200).json();
 });
@@ -42,6 +43,16 @@ exports.getUnite = catchAsync(async (req, res, next) => {
     res.status(200).json({
         status: "success",
         unite,
+    });
+});
+
+
+exports.getListUnite = catchAsync(async (req, res, next) => {
+    const unites = await Unite.find({
+        unite_principale: req.agent.id_unite,
+    });
+    res.status(200).json({
+        unites,
     });
 });
 
@@ -79,15 +90,16 @@ exports.updateInformationUnite = catchAsync(async (req, res, next) => {
         $set: {
             nom: req.body.nom,
             adresse: {
-                wilaya: req.body.wilaya,
-                daira: req.body.daira,
-                adresse_rue: req.body.adresse_rue,
+                wilaya: req.body.adresse.wilaya,
+                daira: req.body.adresse.daira,
+                adresse_rue: req.body.adresse.adresse_rue,
                 gps_coordonnee: {
-                    lat: req.body.gps_coordonnee.lat,
-                    lng: req.body.gps_coordonnee.lng,
+                    lat: req.body.adresse.gps_coordonnee.lat,
+                    lng: req.body.adresse.gps_coordonnee.lng,
                 },
             },
-            type: req.body.type,
+            unite_principale: req.agent.id_unite,
+            numTel: req.body.numTel
         },
     });
 
@@ -268,5 +280,21 @@ exports.getUnitePlusProche = catchAsync(async (req, res, next) => {
     res.status(200).json({
         status: "success",
         unites: resultat_final,
+    });
+});
+
+exports.getListUnitePrincipaleAndSesSecondaire = catchAsync(async (req, res, next) => {
+    const unites = await Unite.find({
+        $or: [{
+            unite_principale: req.agent.id_unite,
+        }, {
+            _id: req.agent.id_unite
+        }]
+    }, {
+        _id: 1,
+        nom: 1
+    });
+    res.status(200).json({
+        unites,
     });
 });

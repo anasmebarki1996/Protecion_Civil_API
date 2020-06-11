@@ -58,23 +58,33 @@ exports.getInterventionStatistiques = catchAsync(async (req, res, next) => {
   // étape pour filtrer les interventions de l'unité 
   // si l'unité est secondaire nous filtrons que ses interventions
   // sinon nous filtrons tous les interventions de ses unites secondaires
-  if (req.unite.type == "secondaire") {
-    interventions = interventions.match({
-      id_unite: ObjectId(req.agent.id_unite),
-    });
-  } else {
-    const unites = await Unite.find({
-      unite_principale: ObjectId(req.unite._id),
-    }, {
-      _id: 1,
-    });
-    let unite = unites.map((x) => ObjectId(x._id));
-    interventions = interventions.match({
-      id_unite: {
-        $in: unite,
+  // if (req.unite.type == "secondaire") {
+  //   interventions = interventions.match({
+  //     id_unite: ObjectId(req.agent.id_unite),
+  //   });
+  // } else {
+  //   const unites = await Unite.find({
+  //     unite_principale: ObjectId(req.unite._id),
+  //   }, {
+  //     _id: 1,
+  //   });
+  //   let unite = unites.map((x) => ObjectId(x._id));
+  //   interventions = interventions.match({
+  //     id_unite: {
+  //       $in: unite,
+  //     },
+  //   });
+  // }
+
+  interventions = interventions.match({
+    $or: [{
+        id_unite: req.unite.query_unite,
       },
-    });
-  }
+      {
+        id_unite_principale: req.agent.id_unite
+      }
+    ]
+  });
 
   // si le filter de l'intervention est activé nous filterons que le node demandé
   if (req.body.id_node && req.body.id_node != "") {
@@ -202,23 +212,32 @@ exports.getInterventionHeatMap = catchAsync(async (req, res, next) => {
       },
     },
   }, ]);
-  if (req.unite.type == "secondaire") {
-    interventions = interventions.match({
-      id_unite: ObjectId(req.agent.id_unite),
-    });
-  } else {
-    const unites = await Unite.find({
-      unite_principale: ObjectId(req.unite._id),
-    }, {
-      _id: 1,
-    });
-    let unite = unites.map((x) => ObjectId(x._id));
-    interventions = interventions.match({
-      id_unite: {
-        $in: unite,
+  // if (req.unite.type == "secondaire") {
+  //   interventions = interventions.match({
+  //     id_unite: ObjectId(req.agent.id_unite),
+  //   });
+  // } else {
+  //   const unites = await Unite.find({
+  //     unite_principale: ObjectId(req.unite._id),
+  //   }, {
+  //     _id: 1,
+  //   });
+  //   let unite = unites.map((x) => ObjectId(x._id));
+  //   interventions = interventions.match({
+  //     id_unite: {
+  //       $in: unite,
+  //     },
+  //   });
+  // }
+  interventions = interventions.match({
+    $or: [{
+        id_unite: req.unite.query_unite,
       },
-    });
-  }
+      {
+        id_unite_principale: req.agent.id_unite
+      }
+    ]
+  });
   if (req.body.id_node && req.body.id_node != "") {
     interventions = interventions.match({
       id_node: ObjectId(req.body.id_node),

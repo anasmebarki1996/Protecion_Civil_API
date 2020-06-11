@@ -6,7 +6,8 @@ const router = express.Router();
 
 
 router
-    .post('/createAgent',  agentController.createAgent)
+    .post('/createAgent', authController.protect, authController.checkUnite, agentController.createAgent)
+    .post('/deleteAgent', authController.protect, authController.checkUnite, agentController.deleteAgent)
     .post('/getAgent/:id?', authController.protect, agentController.getAgent)
     .post('/searchAgent', authController.protect, agentController.searchAgent)
     .post('/getAllAgents', authController.protect, authController.checkUnite, agentController.getAllAgents)

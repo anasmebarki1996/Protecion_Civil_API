@@ -119,23 +119,23 @@ app.all("*", (req, res, next) => {
   next(new appError(`Can't find ${req.originalUrl} on this server`, 404));
 });
 
-app.use(globalErrorHandler);
+// app.use(globalErrorHandler);
 
 // ###################### FIN Routes ######################
 
 const PORT = process.env.PORT || 30001;
-const server = http.listen(PORT, "0.0.0.0", function () {
-  console.log("Server is running on : " + process.env.LOCALHOST + ":" + PORT);
-});
-// const server = http.listen(PORT, process.env.LOCALHOST, function () {
+// const server = http.listen(PORT, "0.0.0.0", function () {
 //   console.log("Server is running on : " + process.env.LOCALHOST + ":" + PORT);
 // });
-
-
-process.on("unhandledRejection", (err) => {
-  console.log(err.name, err.message);
-  console.log("UNHADLED REJECTION! Shuting down ...");
-  server.close(() => {
-    process.exit(0);
-  });
+const server = http.listen(PORT, process.env.LOCALHOST, function () {
+  console.log("Server is running on : " + process.env.LOCALHOST + ":" + PORT);
 });
+
+
+// process.on("unhandledRejection", (err) => {
+//   console.log(err.name, err.message);
+//   console.log("UNHADLED REJECTION! Shuting down ...");
+//   server.close(() => {
+//     process.exit(0);
+//   });
+// });

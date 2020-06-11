@@ -29,29 +29,51 @@ exports.getAllIntervention = catchAsync(async (req, res, next) => {
   end.setSeconds(59);
   // EXECUTE QUERY
   let features, interventions = [];
-  const unites = await Unite.find({
-    unite_principale: ObjectId(req.unite._id),
-  }, {
-    _id: 1
-  });
-  let unite = unites.map((x) => ObjectId(x._id));
+
   interventions = Intervention.find({
     dateTimeAppel: {
       $gte: start,
       $lte: end,
     },
   })
-  if (req.unite.type == "secondaire") {
-    interventions = interventions.where({
-      id_unite: ObjectId(req.agent.id_unite),
-    });
-  } else {
-    interventions = interventions.where({
-      id_unite: {
-        $in: unite
+
+  // const unites = await Unite.find({
+  //   unite_principale: ObjectId(req.unite._id),
+  // }, {
+  //   _id: 1
+  // });
+  // let unite = unites.map((x) => ObjectId(x._id));
+  // if (req.unite.type == "secondaire") {
+  //   interventions = interventions.where({
+  //     id_unite: ObjectId(req.agent.id_unite),
+  //   });
+  // } else {
+  //   interventions = interventions.where({
+  //     $or: [
+  //       {
+  //         id_unite: {
+  //           $in: unite
+  //         },
+  //       },
+  //       {
+  //         id_unite_principale: req.agent.id_unite
+  //       }
+  //     ]
+  //   });
+  // }
+
+  interventions = interventions.where({
+    $or: [{
+        id_unite: req.unite.query_unite,
       },
-    });
-  }
+      {
+        id_unite_principale: req.agent.id_unite
+      }
+    ]
+  });
+
+  const interventions_length = await Intervention.countDocuments(interventions.getQuery());
+
   features = await new APIFeatures(
     interventions,
     req.query
@@ -62,7 +84,7 @@ exports.getAllIntervention = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     interventions,
-    interventions_total: interventions.length,
+    interventions_total: interventions_length
   });
 });
 
@@ -176,21 +198,22 @@ exports.addDateTimeDepart = catchAsync(async (req, res) => {
 
 exports.getAllIntervention_Envoye = catchAsync(async (req, res) => {
   // EXECUTE QUERY
-  let features, interventions = [];
-  features = new APIFeatures(
-    Intervention.find({
-      id_unite: ObjectId(req.agent.id_unite),
-      statut: "envoye"
-    }),
-    req.query
-  ).search().paginate().sort();
+  let features, interventions = [],
+    intervention;
+  intervention = Intervention.find({
+    id_unite: ObjectId(req.agent.id_unite),
+    statut: "envoye"
+  });
+  const interventions_total = await Intervention.countDocuments(intervention.getQuery());
+
+  features = new APIFeatures(intervention, req.query).search().paginate().sort();
   interventions = await features.query;
 
   // SEND RESPONSE
   res.status(200).json({
     status: "success",
     interventions,
-    interventions_total: interventions.length,
+    interventions_total: interventions_total,
   });
 });
 
@@ -216,23 +239,35 @@ exports.getAllIntervention_EnCours = catchAsync(async (req, res) => {
     }
   })
 
-  if (req.unite.type == "secondaire") {
-    interventions.where({
-      id_unite: ObjectId(req.agent.id_unite),
-    })
-  } else {
-    const unites = await Unite.find({
-      unite_principale: ObjectId(req.unite._id),
-    }, {
-      _id: 1,
-    });
-    let unite = unites.map((x) => ObjectId(x._id));
-    interventions = Intervention.where({
-      id_unite: {
-        $in: unite,
+  // if (req.unite.type == "secondaire") {
+  //   interventions.where({
+  //     id_unite: ObjectId(req.agent.id_unite),
+  //   })
+  // } else {
+  //   const unites = await Unite.find({
+  //     unite_principale: ObjectId(req.unite._id),
+  //   }, {
+  //     _id: 1,
+  //   });
+  //   let unite = unites.map((x) => ObjectId(x._id));
+  //   interventions = Intervention.where({
+  //     id_unite: {
+  //       $in: unite,
+  //     },
+  //   });
+  // }
+
+  interventions = interventions.where({
+    $or: [{
+        id_unite: req.unite.query_unite,
       },
-    });
-  }
+      {
+        id_unite_principale: req.agent.id_unite
+      }
+    ]
+  });
+
+  const interventions_total = await Intervention.countDocuments(interventions.getQuery());
 
   features = new APIFeatures(
     interventions,
@@ -244,7 +279,7 @@ exports.getAllIntervention_EnCours = catchAsync(async (req, res) => {
   res.status(200).json({
     status: "success",
     interventions,
-    interventions_total: interventions.length,
+    interventions_total: interventions_total
   });
 });
 

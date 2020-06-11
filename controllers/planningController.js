@@ -47,139 +47,136 @@ exports.addDate = catchAsync(async (req, res, next) => {
 });
 
 exports.getPlanning = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(
-      Planning.aggregate([{
-          $unwind: "$calendrier",
+  let planning = Planning.aggregate([{
+      $unwind: "$calendrier",
+    },
+    {
+      $unwind: "$calendrier.team",
+    },
+    {
+      $match: {
+        id_unite: ObjectId(req.agent.id_unite),
+        "calendrier.date": new Date(req.body.date),
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        team: "$calendrier.team",
+      },
+    },
+    {
+      $unwind: "$team.agents",
+    },
+    {
+      $lookup: {
+        from: "agents",
+        let: {
+          agent: "$team.agents.agent",
         },
-        {
-          $unwind: "$calendrier.team",
-        },
-        {
-          $match: {
-            id_unite: ObjectId(req.agent.id_unite),
-            "calendrier.date": new Date(req.body.date),
-          },
-        },
-        {
-          $project: {
-            _id: 0,
-            team: "$calendrier.team",
-          },
-        },
-        {
-          $unwind: "$team.agents",
-        },
-        {
-          $lookup: {
-            from: "agents",
-            let: {
-              agent: "$team.agents.agent",
-            },
-            pipeline: [{
-                $match: {
-                  $expr: {
-                    $eq: ["$_id", "$$agent"],
-                  },
-                },
-              },
-              {
-                $project: {
-                  nom: 1,
-                  prenom: 1,
-                  username: 1,
-                  numTel: 1,
-                },
-              },
-            ],
-            as: "team.schoolInfo",
-          },
-        },
-        {
-          $unwind: "$team.schoolInfo",
-        },
-        {
-          $project: {
-            team: {
-              _id: "$team._id",
-              id_agent: "$team.schoolInfo._id",
-              nom: "$team.schoolInfo.nom",
-              prenom: "$team.schoolInfo.prenom",
-              username: "$team.schoolInfo.username",
-              numTel: "$team.schoolInfo.numTel",
-              type: "$team.agents.type",
-              engin: "$team.engin",
-            },
-          },
-        },
-        {
-          $lookup: {
-            from: "engins",
-            let: {
-              engin: "$team.engin",
-            },
-            pipeline: [{
-                $match: {
-                  $expr: {
-                    $eq: ["$_id", "$$engin"],
-                  },
-                },
-              },
-              {
-                $project: {
-                  code_name: 1,
-                  matricule: 1,
-                  _id: 0,
-                },
-              },
-            ],
-            as: "team.engin",
-          },
-        },
-        {
-          $unwind: "$team.engin",
-        },
-        {
-          $group: {
-            _id: {
-              _id: "$team._id",
-              engin: "$team.engin",
-            },
-            agents: {
-              $push: {
-                id_agent: "$team.id_agent",
-                nom: "$team.nom",
-                prenom: "$team.prenom",
-                username: "$team.username",
-                numTel: "$team.numTel",
-                type: "$team.type",
+        pipeline: [{
+            $match: {
+              $expr: {
+                $eq: ["$_id", "$$agent"],
               },
             },
           },
+          {
+            $project: {
+              nom: 1,
+              prenom: 1,
+              username: 1,
+              numTel: 1,
+            },
+          },
+        ],
+        as: "team.schoolInfo",
+      },
+    },
+    {
+      $unwind: "$team.schoolInfo",
+    },
+    {
+      $project: {
+        team: {
+          _id: "$team._id",
+          id_agent: "$team.schoolInfo._id",
+          nom: "$team.schoolInfo.nom",
+          prenom: "$team.schoolInfo.prenom",
+          username: "$team.schoolInfo.username",
+          numTel: "$team.schoolInfo.numTel",
+          type: "$team.agents.type",
+          engin: "$team.engin",
         },
-        {
-          $project: {
-            _id: "$_id._id",
-            engin: "$_id.engin",
-            agents: "$agents",
+      },
+    },
+    {
+      $lookup: {
+        from: "engins",
+        let: {
+          engin: "$team.engin",
+        },
+        pipeline: [{
+            $match: {
+              $expr: {
+                $eq: ["$_id", "$$engin"],
+              },
+            },
+          },
+          {
+            $project: {
+              code_name: 1,
+              matricule: 1,
+              _id: 0,
+            },
+          },
+        ],
+        as: "team.engin",
+      },
+    },
+    {
+      $unwind: "$team.engin",
+    },
+    {
+      $group: {
+        _id: {
+          _id: "$team._id",
+          engin: "$team.engin",
+        },
+        agents: {
+          $push: {
+            id_agent: "$team.id_agent",
+            nom: "$team.nom",
+            prenom: "$team.prenom",
+            username: "$team.username",
+            numTel: "$team.numTel",
+            type: "$team.type",
           },
         },
-        {
-          $sort: {
-            _id: 1,
-          },
-        },
-      ]),
-      req.query
-    )
-    .paginate()
-    .sort();
-
+      },
+    },
+    {
+      $project: {
+        _id: "$_id._id",
+        engin: "$_id.engin",
+        agents: "$agents",
+      },
+    },
+    {
+      $sort: {
+        _id: 1,
+      },
+    },
+  ]);
+  let teams_total = new APIFeatures(planning, req.query);
+  teams_total = await teams_total.query;
+  const features = new APIFeatures(planning, req.query).paginate().sort();
   const teams = await features.query;
 
   res.status(200).json({
     status: "success",
     teams: teams,
-    teams_total: teams.length,
+    teams_total: teams_total.length
   });
 });
 

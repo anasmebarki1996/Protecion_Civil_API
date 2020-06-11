@@ -1,4 +1,4 @@
-"use strict";
+// "use strict";
 const Agent = require("./../models/agentModel");
 const Unite = require("./../models/uniteModel");
 const catchAsync = require("./../utils/catchAsync");
@@ -7,6 +7,11 @@ const AppError = require("./../utils/appError");
 const {
     promisify
 } = require("util");
+const {
+    Types: {
+        ObjectId
+    },
+} = (mongoose = require("mongoose"));
 
 const signToken = id => {
     return jwt.sign({
@@ -17,6 +22,7 @@ const signToken = id => {
         }
     );
 };
+
 
 
 
@@ -59,15 +65,10 @@ exports.login = catchAsync(async (req, res, next) => {
     // if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
     res.cookie("agent_jwt", token, cookieOptions);
 
-    res.set("Authorization",token);
-
-    console.log(token);
-
-    
-    console.log(agent)
+    res.set("Authorization", token);
     res.status(200).json({
         status: "success",
-        id_unite:agent.id_unite,
+        id_unite: agent.id_unite,
         agent_id: agent._id,
         agent_nom: agent.nom,
         agent_role: agent.role,
@@ -89,13 +90,9 @@ exports.protect = catchAsync(async (req, res, next) => {
     // 1) Getting token and check of it's there
     if (req.headers.cookie) {
         token = req.headers.cookie.split("agent_jwt=")[1];
-    }else if (req.headers.authorization){
+    } else if (req.headers.authorization) {
         token = req.headers.authorization;
     }
-
-    console.log(token);
-    
-
 
     if (!token) {
         return next(
@@ -143,9 +140,40 @@ exports.checkToken = catchAsync(async (req, res, next) => {
 });
 
 exports.checkUnite = catchAsync(async (req, res, next) => {
+    // get Type unite
     const unite = await Unite.findOne({
         _id: req.agent.id_unite
     });
     req.unite = unite;
+    if (req.unite.type == "secondaire") {
+        req.unite.query_unite = req.agent.id_unite;
+    } else {
+        let unites
+        // verifier si cette unité est permis pour cet agent
+        if (req.body.id_unite && req.body.id_unite != req.agent.id_unite) {
+            unites = await Unite.findOne({
+                unite_principale: ObjectId(req.unite._id),
+                _id: ObjectId(req.body.id_unite)
+            }, {
+                _id: 1,
+            });
+            if (!unites) {
+                return next(
+                    new AppError("Vous n'avez pas la permission", 403)
+                )
+            }
+        }
+        //get unités secondaire
+        unites = await Unite.find({
+            unite_principale: ObjectId(req.unite._id),
+        }, {
+            _id: 1,
+        });
+        let unite = unites.map((x) => ObjectId(x._id));
+        req.unite.query_unite = {
+            $in: unite,
+        };
+    }
+
     next();
 });

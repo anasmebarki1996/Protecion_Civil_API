@@ -4,12 +4,12 @@ const authController = require('../controllers/authController');
 const router = express.Router();
 
 router
-    .post('/createEngin', authController.protect, enginController.createEngin)
-    .post('/getListEngin', authController.protect, enginController.getListEngin)
+    .post('/createEngin', authController.protect, authController.checkUnite, enginController.createEngin)
+    .post('/getListEngin', authController.protect, authController.checkUnite, enginController.getListEngin)
     .get('/engin', authController.protect, enginController.getListEngin) //return the list of engins cRud
-    .post('/updatePanne', authController.protect, enginController.updatePanne)
-    .post('/updateEngin', authController.protect, enginController.updateEngin)
-    .post('/searchEngin', authController.protect, enginController.searchEngin)
-    .post('/changeStatutPanne', authController.protect, enginController.changeStatutPanne)
-    .post('/deleteEngin', authController.protect, enginController.deleteEngin)
+    .post('/updatePanne', authController.protect, authController.checkUnite, enginController.updatePanne)
+    .post('/updateEngin', authController.protect, authController.checkUnite, enginController.updateEngin)
+    .post('/searchEngin', authController.protect, authController.checkUnite, enginController.searchEngin)
+    .post('/changeStatutPanne', authController.protect, authController.checkUnite, enginController.changeStatutPanne)
+    .post('/deleteEngin', authController.protect, authController.checkUnite, enginController.deleteEngin)
 module.exports = router;
