@@ -646,19 +646,15 @@ exports.updateInterventionByChef = catchAsync(async (req, res, next) => {
 
   await Intervention.findOneAndUpdate({
     _id: id_intervention
-
   }, req.body)
 
   const intervention = await Intervention.findOne({
     _id: id_intervention
   });
-
   if (!intervention) {
     return next(new AppError("intervention non disponible", 403));
   }
-
   io.emit("interventionStatusChange", id_intervention)
-
   res.status(200).json(intervention);
 });
 

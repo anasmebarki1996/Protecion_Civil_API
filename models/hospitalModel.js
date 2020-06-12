@@ -23,13 +23,10 @@ const hospitalSchema = new mongoose.Schema({
         required: [true, "Vous devez saisir un numéro telephone"],
         unique:true
     },
-
-
     created_at: {
         type: Date,
         default: dateTime
     },
-
 });
 
 
