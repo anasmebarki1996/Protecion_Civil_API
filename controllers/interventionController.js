@@ -154,7 +154,7 @@ exports.getIntervention = catchAsync(async (req, res, next) => {
     return next(new AppError("cette intervention n'existe pas", 404));
   } else {
     if (req.unite.type == "secondaire") {
-      if (!intervention.id_unite.equals(req.agent.id_unite)) {
+      if (!intervention.id_unite.equals(req.agent.id_unite) && !intervention.id_unite_principale.equals(req.agent.id_unite)) {
         return next(
           new AppError(
             "Vous n'avez pas la permission pour cette intervention",
@@ -163,11 +163,12 @@ exports.getIntervention = catchAsync(async (req, res, next) => {
         );
       }
     } else {
+
       const unites = await Unite.findOne({
         _id: ObjectId(intervention.id_unite),
-        unite_principale: ObjectId(req.unite._id),
+        unite_principale: ObjectId(req.agent.id_unite),
       });
-      if (!unites) {
+      if (!unites && !intervention.id_unite.equals(req.agent.id_unite) && !intervention.id_unite_principale.equals(req.agent.id_unite)) {
         return next(
           new AppError(
             "Vous n'avez pas la permission pour cette intervention",
@@ -285,7 +286,7 @@ exports.getAllIntervention_EnCours = catchAsync(async (req, res) => {
 
 exports.envoyerIntervention = catchAsync(async (req, res, next) => {
 
-  await Intervention.create({
+  let intervention = await Intervention.create({
     numTel: req.body.numTel,
     adresse: {
       wilaya: req.body.wilaya,
@@ -297,7 +298,7 @@ exports.envoyerIntervention = catchAsync(async (req, res, next) => {
       },
     },
     cco_agent: req.agent._id,
-    id_unite: req.agent.id_unite,
+    id_unite: req.body.id_unite,
     id_unite_principale: req.agent.id_unite,
     id_node: req.body.id_node,
     dateTimeAppel: dateTime,
@@ -309,34 +310,64 @@ exports.envoyerIntervention = catchAsync(async (req, res, next) => {
   //     numTel: appel.numTel
   // });
 
+  let unites = [];
+  unites.push(req.agent.id_unite);
+  let unite = await Unite.findOne({
+    _id: req.agent.id_unite
+  });
+  if (unite.unite_principale != req.agent.id_unite) {
+    unites.push(unite.unite_principale)
+  }
+  io.emit("interventionStatusChange", {
+    unites: unites,
+    id_intervention: intervention._id
+  })
+
   res.status(200).json({
     status: "success",
   });
 });
 
 exports.envoyerInterventionAuChef = catchAsync(async (req, res, next) => {
-  const intervention = await Intervention.findOne({
+  const intervention = await Intervention.findOneAndUpdate({
     _id: req.body.id_intervention,
+    id_unite: req.agent.id_unite,
     statut: "envoye"
+  }, {
+    cco_agent_secondaire: req.agent._id,
+    id_team: req.body.id_team,
+    statut: "recu",
   })
 
   if (!intervention) {
     return next(new AppError("intervention non disponible, vous devez acctualiser la page", 403));
   }
 
-  await Intervention.findOneAndUpdate({
-    _id: req.body.id_intervention,
-  }, {
-    $set: {
-      cco_agent_secondaire: req.agent._id,
-      id_unite: req.agent.id_unite,
-      id_team: req.body.id_team,
-      statut: "recu",
-    }
-  });
+  // await Intervention.findOneAndUpdate({
+  //   _id: req.body.id_intervention,
+  // }, {
+  //   $set: {
+  //     cco_agent_secondaire: req.agent._id,
+  //     id_team: req.body.id_team,
+  //     statut: "recu",
+  //   }
+  // });
 
   io.emit("interventionStart", req.body.id_team, req.body.id_intervention)
 
+  let unites = [];
+  unites.push(intervention.id_unite_principale);
+  unites.push(req.agent.id_unite);
+  let unite = await Unite.findOne({
+    _id: req.agent.id_unite
+  });
+  if (unite.unite_principale != intervention.id_unite_principale) {
+    unites.push(unite.unite_principale)
+  }
+  io.emit("interventionStatusChange", {
+    unites: unites,
+    id_intervention: intervention._id
+  })
 
   res.status(200).json({
     status: "success",
@@ -641,9 +672,6 @@ exports.updateInterventionByChef = catchAsync(async (req, res, next) => {
   if (req.body.dateTimeFin == "now()")
     req.body.dateTimeFin = dateTime
 
-
-  console.log("transfer :" + req.body.transfere.hospital)
-
   await Intervention.findOneAndUpdate({
     _id: id_intervention
   }, req.body)
@@ -654,17 +682,28 @@ exports.updateInterventionByChef = catchAsync(async (req, res, next) => {
   if (!intervention) {
     return next(new AppError("intervention non disponible", 403));
   }
-  io.emit("interventionStatusChange", id_intervention)
+  let unites = [];
+  unites.push(intervention.id_unite_principale);
+  unites.push(intervention.id_unite);
+  let unite = await Unite.findOne({
+    _id: intervention.id_unite
+  });
+  if (unite.unite_principale != intervention.id_unite_principale) {
+    unites.push(unite.unite_principale)
+  }
+  io.emit("interventionStatusChange", {
+    unites: unites,
+    id_intervention: id_intervention
+  })
   res.status(200).json(intervention);
 });
 
 exports.test = catchAsync(async (req, res, next) => {
 
-  io.emit("interventionStart", "5e99c95440c1d62ca8ee7906", "5ecdf0b56e77fd030ca168af")
-
+  // io.emit("interventionStart", "5e99c95440c1d62ca8ee7906", "5ecdf0b56e77fd030ca168af")
+  io.emit("interventionStatusChange", "id_intervention")
   res.status(200).json({
     status: "success",
-
   });
 
 

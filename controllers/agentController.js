@@ -25,6 +25,8 @@ exports.getAgent = catchAsync(async (req, res, next) => {
             _id: req.params.id
         });
     }
+
+    console.log(agent)
     if (!agent) {
         return next(
             new AppError("Agent n'existe pas", 403)
@@ -35,7 +37,10 @@ exports.getAgent = catchAsync(async (req, res, next) => {
         id_unite: agent.id_unite,
         agent_id: agent._id,
         agent_nom: agent.nom,
+        agent_prenom: agent.prenom,
+        agent_date_de_naissance: agent.date_de_naissance,
         agent_role: agent.role,
+        agent_numTel: agent.numTel,
         agent_username: agent.username
     })
 });

@@ -205,7 +205,7 @@ exports.getAdresseTeam = catchAsync(async (req, res, next) => {
 exports.setAdresseTeam = catchAsync(async (req, res, next) => {
 
   const id_team = await getTeamId(req.agent);
-  if(id_team == null){
+  if (id_team == null) {
     return next(
       new AppError("cet agent n'est affecté à aucune équipe", 403)
     );
@@ -233,7 +233,7 @@ exports.setAdresseTeam = catchAsync(async (req, res, next) => {
     }
   );
 
-  
+
 
   res.status(200).json({
     status: "success",
@@ -242,7 +242,7 @@ exports.setAdresseTeam = catchAsync(async (req, res, next) => {
 });
 
 exports.getTeamID = catchAsync(async (req, res, next) => {
- 
+
   const id = await getTeamId(req.agent);
 
   res.status(200).json({
@@ -253,6 +253,7 @@ exports.getTeamID = catchAsync(async (req, res, next) => {
 
 // pour avoir la liste des equipes disponible pour leur envoyer les interventions
 exports.getTeamsDisponible = catchAsync(async (req, res, next) => {
+  console.log("changer la data static")
   const teams = await Planning.aggregate([{
       $unwind: "$calendrier",
     },
@@ -357,58 +358,58 @@ exports.getTeamsDisponible = catchAsync(async (req, res, next) => {
 
 
 
-var getTeamId = async function(agent){
-  
+var getTeamId = async function (agent) {
+
   var start = new Date(dateTime);
-    start.setHours(0);
-    start.setMinutes(0);
-    start.setSeconds(0);
-    var end = new Date(dateTime);
-    end.setHours(23);
-    end.setMinutes(59);
-    end.setSeconds(59);
+  start.setHours(0);
+  start.setMinutes(0);
+  start.setSeconds(0);
+  var end = new Date(dateTime);
+  end.setHours(23);
+  end.setMinutes(59);
+  end.setSeconds(59);
   const id_team = await Planning.aggregate([{
-    $unwind: "$calendrier",
-  },
-  {
-    $unwind: "$calendrier.team",
-  },
-  {
-    $match: {
-      id_unite: ObjectId(agent.id_unite),
-      "calendrier.date": new Date("2020-04-02")
-     /* "calendrier.date": {
+      $unwind: "$calendrier",
+    },
+    {
+      $unwind: "$calendrier.team",
+    },
+    {
+      $match: {
+        id_unite: ObjectId(agent.id_unite),
+        "calendrier.date": new Date("2020-04-02")
+        /* "calendrier.date": {
         $gte: start,
         $lte: end,
     },*/
+      },
     },
-  },
-  {
-    $project: {
-      _id: 0,
-      team: "$calendrier.team",
+    {
+      $project: {
+        _id: 0,
+        team: "$calendrier.team",
+      },
     },
-  },
-  {
-    $unwind: "$team.agents",
-  },
-  {
-    $match: {
-      "team.agents.agent": ObjectId(agent._id),
+    {
+      $unwind: "$team.agents",
     },
-  },
-  {
-    $project: {
-      _id: "$team._id",
+    {
+      $match: {
+        "team.agents.agent": ObjectId(agent._id),
+      },
     },
-  },
-]);
+    {
+      $project: {
+        _id: "$team._id",
+      },
+    },
+  ]);
 
 
-if(id_team.length == 0)
-  return null
-else
-  return id_team[0]._id
+  if (id_team.length == 0)
+    return null
+  else
+    return id_team[0]._id
 }
 
 
@@ -417,10 +418,10 @@ exports.getTeamAndroid = catchAsync(async (req, res, next) => {
   const team_id = req.params.id || await getTeamId(req.agent)
 
   console.log(team_id);
-  
-  
-  
-  
+
+
+
+
   const team = await Planning.aggregate([{
       $unwind: "$calendrier",
     },

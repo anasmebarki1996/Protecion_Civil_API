@@ -32,11 +32,11 @@ module.exports = {
 app.use(cors());
 app.use(helmet());
 
-// process.on("uncaughtException", (err) => {
-//   console.log(err.name, err.message);
-//   console.log("UNHADLED REJECTION! Shuting down ...");
-//   process.exit(0);
-// });
+process.on("uncaughtException", (err) => {
+  console.log(err.name, err.message);
+  console.log("UNHADLED REJECTION! Shuting down ...");
+  process.exit(0);
+});
 
 dotenv.config({
   path: "./config.env",
@@ -119,7 +119,7 @@ app.all("*", (req, res, next) => {
   next(new appError(`Can't find ${req.originalUrl} on this server`, 404));
 });
 
-// app.use(globalErrorHandler);
+app.use(globalErrorHandler);
 
 // ###################### FIN Routes ######################
 
@@ -132,10 +132,10 @@ const server = http.listen(PORT, "0.0.0.0", function () {
 // });
 
 
-// process.on("unhandledRejection", (err) => {
-//   console.log(err.name, err.message);
-//   console.log("UNHADLED REJECTION! Shuting down ...");
-//   server.close(() => {
-//     process.exit(0);
-//   });
-// });
+process.on("unhandledRejection", (err) => {
+  console.log(err.name, err.message);
+  console.log("UNHADLED REJECTION! Shuting down ...");
+  server.close(() => {
+    process.exit(0);
+  });
+});
