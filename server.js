@@ -108,13 +108,7 @@ app.use("/API/", enginRoutes);
 app.use("/API/", hospitalRoutes);
 app.use(require('./socket.js').router);
 const io = require("./socket.js").io;
-io.emit("test");
 
-
-/*app.use(require('./socket.js').router);
-const io = require("./socket.js").io;
-io.emit("test");
-*/
 app.all("*", (req, res, next) => {
   next(new appError(`Can't find ${req.originalUrl} on this server`, 404));
 });
