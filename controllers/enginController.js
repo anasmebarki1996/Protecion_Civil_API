@@ -22,17 +22,10 @@ exports.createEngin = catchAsync(async (req, res, next) => {
 });
 
 exports.changeStatutPanne = catchAsync(async (req, res, next) => {
-    if (req.unite.type == "principale") {
-        const unite = await Unite.findOne({
-            unite_principale: req.agent.id_unite
-        });
-        if (unite) {
-            req.agent.id_unite = unite._id;
-        }
-    }
+    if (req.unite.type == "principale") req.unite.query_unite['$in'].push(ObjectId(req.unite._id))
     await Engin.findOneAndUpdate({
         _id: req.body.id_engin,
-        id_unite: req.agent.id_unite
+        id_unite: req.unite.query_unite
     }, {
         $set: {
             panne: !req.body.panne
@@ -85,6 +78,27 @@ exports.getListEngin = catchAsync(async (req, res, next) => {
 
 
     if (req.unite.type == "principale") req.unite.query_unite['$in'].push(ObjectId(req.unite._id))
+
+
+    if (req.body.id_unite) {
+        if (req.unite.type == "principale") {
+            for (let i = 0; i < req.unite.query_unite['$in'].length; i++) {
+                if (req.body.id_unite == req.unite.query_unite['$in'][i]) {
+                    req.unite.query_unite = ObjectId(req.body.id_unite)
+                    break;
+                }
+            }
+
+        } else if (req.unite.type == "secondaire" && req.agent.id_unite == req.body.id_unite) {
+            req.unite.query_unite = ObjectId(req.body.id_unite)
+        } else {
+            return next(
+                new AppError("Vous n'avez pas la permission", 403)
+            )
+        }
+
+    }
+
     let engins = Engin.find({
         id_unite: req.unite.query_unite
     })
@@ -125,37 +139,73 @@ exports.updatePanne = catchAsync(async (req, res, next) => {
 });
 
 exports.updateEngin = catchAsync(async (req, res, next) => {
-    if (req.unite.type == "principale" && req.body.nom_unite) {
+    if (req.unite.type == "principale" && req.body.id_unite) {
         const unite = await Unite.findOne({
-            nom: req.body.nom_unite,
-            unite_principale: req.agent.id_unite
+            $or: [{
+                    _id: ObjectId(req.body.id_unite),
+                    unite_principale: req.agent.id_unite,
+                    type: "secondaire"
+                },
+                {
+                    _id: ObjectId(req.body.id_unite),
+                    type: "principale"
+                }
+            ]
         });
         if (unite) {
-            req.agent.id_unite = unite._id;
-            await Engin.findByIdAndUpdate({
-                _id: req.body.id_engin,
-                id_unite: req.agent.id_unite
-            }, {
-                $set: {
-                    name: req.body.name,
-                    code_name: req.body.code_name,
-                    matricule: req.body.matricule,
-                    id_unite: req.agent.id_unite,
-                }
-            });
-        }
-    } else {
-        await Engin.findByIdAndUpdate({
-            _id: req.body.id_engin,
-            id_unite: req.agent.id_unite
-        }, {
-            $set: {
-                name: req.body.name,
-                code_name: req.body.code_name,
-                matricule: req.body.matricule,
+            if (unite._id != req.agent.id_unite && unite.type == "principale") {
+                return next(
+                    new AppError("Vous n'avez pas la permission", 403)
+                )
             }
-        });
+            req.agent.id_unite = unite._id;
+        }
     }
+
+    if (req.unite.type == "principale") req.unite.query_unite['$in'].push(ObjectId(req.unite._id))
+
+    await Engin.findOneAndUpdate({
+        _id: req.body.id_engin,
+        id_unite: req.unite.query_unite
+    }, {
+        $set: {
+            name: req.body.name,
+            code_name: req.body.code_name,
+            matricule: req.body.matricule,
+            id_unite: req.agent.id_unite,
+        }
+    });
+    // if (req.unite.type == "principale" && req.body.id_unite) {
+    //     const unite = await Unite.findOne({
+    //         nom: req.body.nom_unite,
+    //         unite_principale: req.agent.id_unite
+    //     });
+    //     if (unite) {
+    //         req.agent.id_unite = unite._id;
+    //         await Engin.findByIdAndUpdate({
+    //             _id: req.body.id_engin,
+    //             id_unite: req.agent.id_unite
+    //         }, {
+    //             $set: {
+    //                 name: req.body.name,
+    //                 code_name: req.body.code_name,
+    //                 matricule: req.body.matricule,
+    //                 id_unite: req.agent.id_unite,
+    //             }
+    //         });
+    //     }
+    // } else {
+    //     await Engin.findByIdAndUpdate({
+    //         _id: req.body.id_engin,
+    //         id_unite: req.agent.id_unite
+    //     }, {
+    //         $set: {
+    //             name: req.body.name,
+    //             code_name: req.body.code_name,
+    //             matricule: req.body.matricule,
+    //         }
+    //     });
+    // }
 
 
     res.status(200).json({
@@ -166,7 +216,7 @@ exports.updateEngin = catchAsync(async (req, res, next) => {
 exports.deleteEngin = catchAsync(async (req, res, next) => {
     await Engin.deleteOne({
         _id: req.body.id_engin,
-        id_unite: req.agent.id_unite
+        id_unite: req.unite.query_unite
     });
 
     res.status(200).json();

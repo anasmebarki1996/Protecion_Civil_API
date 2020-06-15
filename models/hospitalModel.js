@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 const dateTime = require("../utils/moment").dateTime;
-const validator = require("validator");
-const bcrypt = require("bcrypt");
 
 const hospitalSchema = new mongoose.Schema({
     name: {

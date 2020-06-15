@@ -3,7 +3,10 @@ const Unite = require("../models/uniteModel");
 const catchAsync = require('../utils/catchAsync');
 const APIFeatures = require('../utils/apiFeatures');
 const AppError = require('../utils/appError');
-const _ = require('lodash')
+const _ = require('lodash');
+const {
+    findOne
+} = require("../models/agentModel");
 
 const {
     Types: {
@@ -12,21 +15,22 @@ const {
 } = (mongoose = require("mongoose"));
 
 exports.getAgent = catchAsync(async (req, res, next) => {
+    if (req.unite.type == "principale") req.unite.query_unite['$in'].push(ObjectId(req.unite._id))
     var agent;
+
     if (req.body.id_agent) {
         agent = await Agent.findOne({
-            id_unite: req.agent.id_unite,
-            _id: req.body.id_agent
+            id_unite: req.unite.query_unite,
+            _id: ObjectId(req.body.id_agent)
         });
     } else if (req.params.id) {
         //this modification is for the android use
         agent = await Agent.findOne({
-            //id_unite: req.agent.id_unite,
+            id_unite: req.unite.query_unite,
             _id: req.params.id
         });
     }
 
-    console.log(agent)
     if (!agent) {
         return next(
             new AppError("Agent n'existe pas", 403)
@@ -45,7 +49,7 @@ exports.getAgent = catchAsync(async (req, res, next) => {
     })
 });
 
-exports.getAllAgents = catchAsync(async (req, res) => {
+exports.getAllAgents = catchAsync(async (req, res, next) => {
     let agents = [];
     // if (req.unite.type == "secondaire") {
     //     agents = Agent.find({
@@ -94,15 +98,35 @@ exports.getAllAgents = catchAsync(async (req, res) => {
     // }
 
     if (req.unite.type == "principale") req.unite.query_unite['$in'].push(ObjectId(req.unite._id))
+    if (req.body.id_unite) {
+        if (req.unite.type == "principale") {
+            for (let i = 0; i < req.unite.query_unite['$in'].length; i++) {
+                if (req.body.id_unite == req.unite.query_unite['$in'][i]) {
+                    req.unite.query_unite = ObjectId(req.body.id_unite)
+                    break;
+                }
+            }
+
+        } else if (req.unite.type == "secondaire" && req.agent.id_unite == req.body.id_unite) {
+            req.unite.query_unite = ObjectId(req.body.id_unite)
+        } else {
+            return next(
+                new AppError("Vous n'avez pas la permission", 403)
+            )
+        }
+
+    }
     agents = Agent.find({
-        id_unite: req.unite.query_unite
+        id_unite: req.unite.query_unite,
     });
 
+    console.log(req.unite.query_unite)
     if (req.agent.role != "admin") {
         agents.where({
             role: "agent"
         })
     }
+
     const agents_length = await Agent.countDocuments(agents.getQuery());
 
     const features = new APIFeatures(agents, req.query).search().paginate().sort();
@@ -116,8 +140,9 @@ exports.getAllAgents = catchAsync(async (req, res) => {
 
 exports.createAgent = catchAsync(async (req, res, next) => {
     if (req.unite.type == "principale" && req.body.id_unite) {
+        console.log("#########################")
         const unite = await Unite.findOne({
-            id_unite: req.body.id_unite,
+            _id: ObjectId(req.body.id_unite),
             unite_principale: req.agent.id_unite
         });
         if (unite) {
@@ -142,9 +167,10 @@ exports.createAgent = catchAsync(async (req, res, next) => {
 });
 
 exports.updatePersonnelAgent = catchAsync(async (req, res, next) => {
+    if (req.unite.type == "principale") req.unite.query_unite['$in'].push(ObjectId(req.unite._id));
     await Agent.findOneAndUpdate({
-        _id: req.body.id_agent,
-        id_unite: req.agent.id_unite
+        _id: ObjectId(req.body.id_agent),
+        id_unite: req.unite.query_unite
     }, {
         $set: {
             nom: req.body.nom,
@@ -161,16 +187,31 @@ exports.updatePersonnelAgent = catchAsync(async (req, res, next) => {
 exports.updateCompteAgent = catchAsync(async (req, res, next) => {
     if (req.unite.type == "principale" && req.body.id_unite) {
         const unite = await Unite.findOne({
-            id_unite: req.body.id_unite,
-            unite_principale: req.agent.id_unite
+            $or: [{
+                    _id: ObjectId(req.body.id_unite),
+                    unite_principale: req.agent.id_unite,
+                    type: "secondaire"
+                },
+                {
+                    _id: ObjectId(req.body.id_unite),
+                    type: "principale"
+                }
+            ]
         });
         if (unite) {
+            if (unite._id != req.agent.id_unite && unite.type == "principale") {
+                return next(
+                    new AppError("Vous n'avez pas la permission", 403)
+                )
+            }
             req.agent.id_unite = unite._id;
         }
     }
+
+    if (req.unite.type == "principale") req.unite.query_unite['$in'].push(ObjectId(req.unite._id))
     await Agent.findOneAndUpdate({
-        _id: req.body.id_agent,
-        id_unite: req.agent.id_unite
+        _id: ObjectId(req.body.id_agent),
+        id_unite: req.unite.query_unite
     }, {
         $set: {
             role: req.body.role,
@@ -178,6 +219,7 @@ exports.updateCompteAgent = catchAsync(async (req, res, next) => {
             id_unite: req.agent.id_unite
         }
     })
+
     res.status(200).json({
         status: "success",
     });
@@ -185,7 +227,7 @@ exports.updateCompteAgent = catchAsync(async (req, res, next) => {
 
 exports.updatePasswordAgent = catchAsync(async (req, res, next) => {
     await Agent.findOneAndUpdate({
-        _id: req.body.id_agent,
+        _id: ObjectId(req.body.id_agent),
         id_unite: req.agent.id_unite
     }, {
         $set: {
@@ -223,7 +265,7 @@ exports.deleteAgent = catchAsync(async (req, res, next) => {
     // if (req.unite.type == "secondaire") {
     //     agent = await Agent.findOneAndRemove({
     //         id_unite: req.agent.id_unite,
-    //         _id: req.body.id_agent
+    //         _id: ObjectId(req.body.id_agent)
     //     });
     // } else {
     //     const unites = await Unite.find({
@@ -235,19 +277,18 @@ exports.deleteAgent = catchAsync(async (req, res, next) => {
     //     unite.push(ObjectId(req.unite._id));
     //     agent = await Agent.findOneAndRemove({
     //         id_unite: req.unite.query_unite,
-    //         _id: req.body.id_agent
+    //         _id: ObjectId(req.body.id_agent)
     //     });
     // }
     if (req.unite.type == "principale") req.unite.query_unite['$in'].push(ObjectId(req.unite._id))
     agent = await Agent.findOneAndRemove({
         id_unite: req.unite.query_unite,
-        _id: req.body.id_agent
+        _id: ObjectId(req.body.id_agent)
     });
     if (!agent) {
         return next(
             new AppError("Agent n'existe pas", 403)
         )
     }
-    console.log(agent)
     res.status(200).json()
 });

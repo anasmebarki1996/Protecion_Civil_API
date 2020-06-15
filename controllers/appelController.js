@@ -6,7 +6,12 @@ const dateTime = require("../utils/moment").dateTime;
 const moment = require("../utils/moment").moment;
 
 exports.nouveauAppel = catchAsync(async (req, res, next) => {
+
     if (req.body.gps_coordonnee.lat && req.body.gps_coordonnee.lng && req.body.numTel) {
+
+        await Appel.findByIdAndDelete({
+            numTel: req.body.numTel,
+        })
         await Appel.create({
             numTel: req.body.numTel,
             gps_coordonnee: {

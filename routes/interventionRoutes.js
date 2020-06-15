@@ -13,14 +13,13 @@ router
     .post('/addDateTimeDepart', authController.protect, authController.restricTo('chef'), appelController.addDateTimeDepart)
     .post('/intervention/getIntervention', authController.protect, authController.checkUnite, interventionController.getIntervention)
     .get('/intervention/getAllIntervention_name', authController.protect, authController.checkUnite, interventionController.getAllIntervention_name)
-    .post('/intervention/envoyerIntervention', authController.protect, interventionController.envoyerIntervention)
-    .post('/intervention/envoyerInterventionAuChef', authController.protect, interventionController.envoyerInterventionAuChef)
+    .post('/intervention/envoyerIntervention', authController.protect, authController.restricTo('cco_agent', 'admin'), interventionController.envoyerIntervention)
+    .post('/intervention/envoyerInterventionAuChef', authController.protect, authController.restricTo('cco_agent', 'admin'), interventionController.envoyerInterventionAuChef)
     .post('/intervention/getIntervention_details', authController.protect, authController.restricTo('cco_agent', 'admin'), interventionController.getIntervention_details)
+    .get("/intervention/getInterventionByChef/:id_team?", authController.protect, interventionController.getInterventionByChef)
+    .post("/intervention/updateInterventionByChef/:id_intervention", authController.protect, interventionController.updateInterventionByChef)
+    .post("/intervention/updateInterventionStatus/:id_intervention", authController.protect, interventionController.updateInterventionStatus)
+    .get("/test", interventionController.test)
 
-    .get("/intervention/getInterventionByChef/:id_team?",interventionController.getInterventionByChef)
-    .post("/intervention/updateInterventionByChef/:id_intervention",interventionController.updateInterventionByChef)
-    .post("/intervention/updateInterventionStatus/:id_intervention",interventionController.updateInterventionStatus)
-    .get("/test",interventionController.test)
-    
 
 module.exports = router;

@@ -10,9 +10,8 @@ router
     .post('/team/getAdresseAllTeams', authController.protect, teamController.getAdresseAllTeams)
     .post('/team/getAdresseTeam', authController.protect, teamController.getAdresseTeam)
     .post('/team/setAdresseTeam', authController.protect, teamController.setAdresseTeam)
-
     .post('/team/getTeamsDisponible', authController.protect, teamController.getTeamsDisponible)
-    .get('/team/:id?',authController.protect,teamController.getTeamAndroid)
+    .get('/team/:id?', authController.protect, teamController.getTeamAndroid)
 
 
 module.exports = router;

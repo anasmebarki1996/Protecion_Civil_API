@@ -49,8 +49,16 @@ exports.getUnite = catchAsync(async (req, res, next) => {
 
 exports.getListUnite = catchAsync(async (req, res, next) => {
     const unites = await Unite.find({
-        unite_principale: req.agent.id_unite,
+        $or: [{
+                unite_principale: req.agent.id_unite,
+            },
+            {
+                _id: req.agent.id_unite,
+            }
+        ]
+
     });
+
     res.status(200).json({
         unites,
     });
