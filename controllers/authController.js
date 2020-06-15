@@ -41,19 +41,18 @@ exports.login = catchAsync(async (req, res, next) => {
     const agent = await Agent.findOne({
         username: username
     }).select("+password");
-
     if (!agent) {
         return next(new AppError("Veuillez-vous vérifier votre nom d'utilisateur et votre mot de passe!", 401));
     }
 
     const checkPassword = await agent.checkPassword(password, agent.password);
+    console.log(checkPassword)
     if (!checkPassword) {
         return next(new AppError("Veuillez-vous vérifier votre nom d'utilisateur et votre mot de passe!", 401));
     }
 
     // 3) if everything ok , send token to client
     const token = signToken(agent._id);
-
     const cookieOptions = {
         expires: new Date(
             Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
