@@ -6,6 +6,7 @@ const AppError = require("../utils/appError");
 const APIFeatures = require("../utils/apiFeatures");
 const moment = require("../utils/moment").moment;
 const dateTime = require("../utils/moment").dateTime;
+const date = require("../utils/moment").date;
 const {
   Types: {
     ObjectId
@@ -155,7 +156,7 @@ exports.getAdresseAllTeams = catchAsync(async (req, res, next) => {
     {
       $match: {
         id_unite: ObjectId(req.agent.id_unite),
-        "calendrier.date": new Date("2020-04-02"),
+        "calendrier.date": new Date(date),
       },
     },
     {
@@ -184,7 +185,7 @@ exports.getAdresseTeam = catchAsync(async (req, res, next) => {
     {
       $match: {
         id_unite: ObjectId(req.agent.id_unite),
-        "calendrier.date": new Date("2020-04-02"),
+        "calendrier.date": new Date(date),
         "calendrier.team._id": ObjectId(req.body.id_team)
       },
     },
@@ -253,7 +254,8 @@ exports.getTeamID = catchAsync(async (req, res, next) => {
 
 // pour avoir la liste des equipes disponible pour leur envoyer les interventions
 exports.getTeamsDisponible = catchAsync(async (req, res, next) => {
-  console.log("changer la data static")
+  console.log(req.agent.id_unite)
+  console.log(req.body)
   const teams = await Planning.aggregate([{
       $unwind: "$calendrier",
     },
@@ -263,7 +265,7 @@ exports.getTeamsDisponible = catchAsync(async (req, res, next) => {
     {
       $match: {
         id_unite: ObjectId(req.agent.id_unite),
-        "calendrier.date": new Date("2020-04-02"),
+        "calendrier.date": new Date(date),
       },
     },
     {
@@ -377,7 +379,7 @@ var getTeamId = async function (agent) {
     {
       $match: {
         id_unite: ObjectId(agent.id_unite),
-        "calendrier.date": new Date("2020-04-02")
+        "calendrier.date": new Date(date)
         /* "calendrier.date": {
         $gte: start,
         $lte: end,

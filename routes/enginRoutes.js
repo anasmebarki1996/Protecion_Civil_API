@@ -13,4 +13,5 @@ router
     .post('/searchEngin', authController.protect, authController.checkUnite, enginController.searchEngin)
     .post('/changeStatutPanne', authController.protect, authController.restricTo('admin', 'cco_agent'), authController.checkUnite, enginController.changeStatutPanne)
     .post('/deleteEngin', authController.protect, authController.restricTo('admin', 'cco_agent'), authController.checkUnite, enginController.deleteEngin)
+
 module.exports = router;

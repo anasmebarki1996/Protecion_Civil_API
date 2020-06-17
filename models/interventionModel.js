@@ -77,7 +77,7 @@ const interventionSchema = new mongoose.Schema({
   },
   // si il y a un transfere vers l'hopital par exemple et le temps d'arrivé a l'hopital = temps fin
   transfere: {
-    hospital:{
+    hospital: {
       type: mongoose.Schema.ObjectId,
       ref: "Hospital",
     },
@@ -87,11 +87,9 @@ const interventionSchema = new mongoose.Schema({
     gps_coordonnee: {
       lat: {
         type: Number,
-        required: [true, "Vous devez saisir le lat"],
       },
       lng: {
         type: Number,
-        required: [true, "Vous devez saisir la lng"],
       },
     },
   },

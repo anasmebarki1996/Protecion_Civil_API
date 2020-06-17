@@ -2,6 +2,7 @@ const Unite = require("../models/uniteModel");
 const Planning = require("../models/planningModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const date = require('../utils/moment').date;
 const {
     Types: {
         ObjectId
@@ -165,7 +166,7 @@ exports.getUnitePlusProche = catchAsync(async (req, res, next) => {
                 },
                 {
                     $match: {
-                        "calendrier.date": new Date("2020-04-02"),
+                        "calendrier.date": new Date(date),
                         id_unite: {
                             $in: unites_initial,
                         },
@@ -302,6 +303,7 @@ exports.getListUnitePrincipaleAndSesSecondaire = catchAsync(async (req, res, nex
         _id: 1,
         nom: 1
     });
+
     res.status(200).json({
         unites,
     });

@@ -9,12 +9,35 @@ const {
     },
 } = (mongoose = require("mongoose"));
 exports.createEngin = catchAsync(async (req, res, next) => {
+    if (req.unite.type == "principale" && req.body.id_unite) {
+        const unite = await Unite.findOne({
+            $or: [{
+                    _id: ObjectId(req.body.id_unite),
+                    unite_principale: req.agent.id_unite,
+                    type: "secondaire"
+                },
+                {
+                    _id: ObjectId(req.body.id_unite),
+                    type: "principale"
+                }
+            ]
+        });
+
+        if (unite) {
+            if (!req.agent.id_unite.equals(unite._id) && unite.type == "principale") {
+                return next(
+                    new AppError("Vous n'avez pas la permission", 403)
+                )
+            }
+            req.agent.id_unite = unite._id;
+        }
+    }
 
     await Engin.create({
         name: req.body.name,
         code_name: req.body.code_name,
         matricule: req.body.matricule,
-        id_unite: req.body.id_unite,
+        id_unite: req.agent.id_unite,
     });
 
     res.status(200).json({
@@ -153,8 +176,9 @@ exports.updateEngin = catchAsync(async (req, res, next) => {
                 }
             ]
         });
+
         if (unite) {
-            if (unite._id != req.agent.id_unite && unite.type == "principale") {
+            if (!req.agent.id_unite.equals(unite._id) && unite.type == "principale") {
                 return next(
                     new AppError("Vous n'avez pas la permission", 403)
                 )

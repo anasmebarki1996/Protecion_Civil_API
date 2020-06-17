@@ -140,7 +140,6 @@ exports.getAllAgents = catchAsync(async (req, res, next) => {
 
 exports.createAgent = catchAsync(async (req, res, next) => {
     if (req.unite.type == "principale" && req.body.id_unite) {
-        console.log("#########################")
         const unite = await Unite.findOne({
             _id: ObjectId(req.body.id_unite),
             unite_principale: req.agent.id_unite
@@ -199,7 +198,7 @@ exports.updateCompteAgent = catchAsync(async (req, res, next) => {
             ]
         });
         if (unite) {
-            if (unite._id != req.agent.id_unite && unite.type == "principale") {
+            if (!req.agent.id_unite.equals(unite._id) && unite.type == "principale") {
                 return next(
                     new AppError("Vous n'avez pas la permission", 403)
                 )

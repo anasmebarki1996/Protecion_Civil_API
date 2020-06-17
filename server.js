@@ -19,7 +19,7 @@ const limiter = rateLimit({
   // pour maximiser 100 requetes / heure pour le meme @IP
   max: 100,
   windowMs: 60 * 60 * 1000,
-  message: "Too many requests from this IP,please try again in an hour !",
+  message: "Trop de requetes de cette adresse IP, veuillez réessayer dans une heure!",
 });
 
 var http = require("http").Server(app);
@@ -28,6 +28,7 @@ module.exports = {
 };
 
 // app.use("/API", limiter);
+
 // set security HTTP headers
 app.use(cors());
 app.use(helmet());
@@ -73,6 +74,7 @@ app.use(
 );
 app.use(bodyParser.json());
 //fin partie bodyParser
+
 
 // data sanitization agaist NoSQL query injection
 app.use(mongoSanitize());
