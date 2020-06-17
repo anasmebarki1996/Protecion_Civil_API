@@ -28,8 +28,10 @@ exports.getAllIntervention = catchAsync(async (req, res, next) => {
   end.setMinutes(59);
   end.setSeconds(59);
   // EXECUTE QUERY
-  let features, interventions = [];
 
+  console.log(start)
+  console.log(end)
+  let features, interventions = [];
   interventions = Intervention.find({
     dateTimeAppel: {
       $gte: start,
@@ -62,6 +64,7 @@ exports.getAllIntervention = catchAsync(async (req, res, next) => {
   //   });
   // }
 
+  console.log(req.unite.query_unite)
   interventions = interventions.where({
     $or: [{
         id_unite: req.unite.query_unite,
@@ -329,6 +332,7 @@ exports.envoyerIntervention = catchAsync(async (req, res, next) => {
 });
 
 exports.envoyerInterventionAuChef = catchAsync(async (req, res, next) => {
+  console.log(req.body)
   const intervention = await Intervention.findOneAndUpdate({
     _id: req.body.id_intervention,
     id_unite: req.agent.id_unite,
@@ -338,7 +342,7 @@ exports.envoyerInterventionAuChef = catchAsync(async (req, res, next) => {
     id_team: req.body.id_team,
     statut: "recu",
   })
-
+  console.log(intervention)
   if (!intervention) {
     return next(new AppError("intervention non disponible, vous devez acctualiser la page", 403));
   }
