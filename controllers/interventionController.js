@@ -39,32 +39,6 @@ exports.getAllIntervention = catchAsync(async (req, res, next) => {
     },
   })
 
-  // const unites = await Unite.find({
-  //   unite_principale: ObjectId(req.unite._id),
-  // }, {
-  //   _id: 1
-  // });
-  // let unite = unites.map((x) => ObjectId(x._id));
-  // if (req.unite.type == "secondaire") {
-  //   interventions = interventions.where({
-  //     id_unite: ObjectId(req.agent.id_unite),
-  //   });
-  // } else {
-  //   interventions = interventions.where({
-  //     $or: [
-  //       {
-  //         id_unite: {
-  //           $in: unite
-  //         },
-  //       },
-  //       {
-  //         id_unite_principale: req.agent.id_unite
-  //       }
-  //     ]
-  //   });
-  // }
-
-  console.log(req.unite.query_unite)
   interventions = interventions.where({
     $or: [{
         id_unite: req.unite.query_unite,
@@ -288,7 +262,7 @@ exports.getAllIntervention_EnCours = catchAsync(async (req, res) => {
 });
 
 exports.envoyerIntervention = catchAsync(async (req, res, next) => {
-
+  console.log(req.body.description)
   let intervention = await Intervention.create({
     numTel: req.body.numTel,
     adresse: {
@@ -300,6 +274,7 @@ exports.envoyerIntervention = catchAsync(async (req, res, next) => {
         lng: req.body.gps_coordonnee.lng,
       },
     },
+    description: req.body.description,
     cco_agent: req.agent._id,
     id_unite: req.body.id_unite,
     id_unite_principale: req.agent.id_unite,
@@ -342,20 +317,9 @@ exports.envoyerInterventionAuChef = catchAsync(async (req, res, next) => {
     id_team: req.body.id_team,
     statut: "recu",
   })
-  console.log(intervention)
   if (!intervention) {
     return next(new AppError("intervention non disponible, vous devez acctualiser la page", 403));
   }
-
-  // await Intervention.findOneAndUpdate({
-  //   _id: req.body.id_intervention,
-  // }, {
-  //   $set: {
-  //     cco_agent_secondaire: req.agent._id,
-  //     id_team: req.body.id_team,
-  //     statut: "recu",
-  //   }
-  // });
 
   io.emit("interventionStart", req.body.id_team, req.body.id_intervention)
 
