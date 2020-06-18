@@ -662,27 +662,36 @@ exports.updateInterventionStatus = catchAsync(async (req, res, next) => {
 })
 
 exports.updateInterventionByChef = catchAsync(async (req, res, next) => {
+  
   const id_intervention = req.params.id_intervention;
 
   if (req.body.dateTimeDepart == "now()")
     req.body.dateTimeDepart = dateTime
 
-  if (req.body.dateTimeArrive == "now()")
+  else if (req.body.dateTimeArrive == "now()")
     req.body.dateTimeArrive = dateTime
 
-  if (req.body.transfere.dateTimeDepart == "now()")
+  else if (req.body.transfere.dateTimeDepart == "now()")
     req.body.transfere.dateTimeDepart = dateTime
-
-  if (req.body.dateTimeFin == "now()")
+  else if (req.body.dateTimeFin == "now()")
     req.body.dateTimeFin = dateTime
 
+
+
+
+
+    
   await Intervention.findOneAndUpdate({
     _id: id_intervention
   }, req.body)
 
+  
+
   const intervention = await Intervention.findOne({
     _id: id_intervention
   });
+
+  
   if (!intervention) {
     return next(new AppError("intervention non disponible", 403));
   }
