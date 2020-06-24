@@ -3,8 +3,8 @@ const Intervention = require("../models/interventionModel");
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 let dateTime = require("../utils/moment").dateTime;
-let moment = require("../utils/moment").moment;
-let test = require('moment-timezone');
+var moment = require('moment-timezone');
+var test = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
 
 exports.nouveauAppel = catchAsync(async (req, res, next) => {
 
@@ -26,7 +26,7 @@ exports.nouveauAppel = catchAsync(async (req, res, next) => {
             dateTime: dateTime,
             status: "success",
             date: date,
-            moment: moment,
+            moment: "moment",
             test: test
         });
     } else {
