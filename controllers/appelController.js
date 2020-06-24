@@ -3,7 +3,8 @@ const Intervention = require("../models/interventionModel");
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 let dateTime = require("../utils/moment").dateTime;
-const moment = require("../utils/moment").moment;
+let moment = require("../utils/moment").moment;
+let test = require('moment-timezone');
 
 exports.nouveauAppel = catchAsync(async (req, res, next) => {
 
@@ -23,9 +24,10 @@ exports.nouveauAppel = catchAsync(async (req, res, next) => {
 
         res.status(200).json({
             status: "success",
-            dateTime,
-            date,
-            moment
+            dateTime: dateTime,
+            date: date,
+            moment: moment,
+            test: test
         });
     } else {
         return next(new AppError("Vous devriez activer le GPS! S'il vous plait", 401));
