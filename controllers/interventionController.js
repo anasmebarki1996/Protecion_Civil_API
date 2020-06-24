@@ -273,7 +273,7 @@ exports.envoyerIntervention = catchAsync(async (req, res, next) => {
       },
     },
     description: req.body.description,
-    cco_agent: req.agent._id,
+    cco_agent_principale: req.agent._id,
     id_unite: req.body.id_unite,
     id_unite_principale: req.agent.id_unite,
     id_node: req.body.id_node,
@@ -350,6 +350,7 @@ exports.envoyerInterventionAuChef = catchAsync(async (req, res, next) => {
 });
 
 exports.getIntervention_details = catchAsync(async (req, res, next) => {
+  console.log(req.body)
   let intervention = await Intervention.aggregate([{
       $match: {
         _id: ObjectId(req.body.id_intervention),
@@ -473,7 +474,7 @@ exports.getIntervention_details = catchAsync(async (req, res, next) => {
     },
     {
       $match: {
-        id_unite: ObjectId(req.agent.id_unite),
+        id_unite: req.unite.query_unite,
         "calendrier.team._id": ObjectId(intervention[0].id_team),
       },
     },
@@ -577,6 +578,8 @@ exports.getIntervention_details = catchAsync(async (req, res, next) => {
       },
     },
   ]);
+
+  console.log(team)
 
   res.status(200).json({
     status: "success",

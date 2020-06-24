@@ -347,6 +347,11 @@ exports.getTeamsDisponible = catchAsync(async (req, res, next) => {
     {
       $unwind: "$engin",
     },
+    {
+      $match: {
+        "engin.panne": false
+      },
+    },
     // {
     //   $project: {
     //     _id: 0,

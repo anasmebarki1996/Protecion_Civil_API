@@ -14,7 +14,7 @@ router
     .get('/intervention/getAllIntervention_name', authController.protect, authController.checkUnite, interventionController.getAllIntervention_name)
     .post('/intervention/envoyerIntervention', authController.protect, authController.restricTo('cco_agent', 'admin'), interventionController.envoyerIntervention)
     .post('/intervention/envoyerInterventionAuChef', authController.protect, authController.restricTo('cco_agent', 'admin'), interventionController.envoyerInterventionAuChef)
-    .post('/intervention/getIntervention_details', authController.protect, authController.restricTo('cco_agent', 'admin'), interventionController.getIntervention_details)
+    .post('/intervention/getIntervention_details', authController.protect, authController.restricTo('cco_agent', 'admin'), authController.checkUnite, interventionController.getIntervention_details)
     .get("/intervention/getInterventionByChef/:id_team?", authController.protect, interventionController.getInterventionByChef)
     .post("/intervention/updateInterventionByChef/:id_intervention", authController.protect, interventionController.updateInterventionByChef)
     .post("/intervention/updateInterventionStatus/:id_intervention", authController.protect, interventionController.updateInterventionStatus)
