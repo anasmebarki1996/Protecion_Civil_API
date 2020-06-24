@@ -1,17 +1,13 @@
 const Appel = require("../models/appelModel");
-const Intervention = require("../models/interventionModel");
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-var moment = require('moment-timezone');
-let coucou = require("../utils/moment").coucou;
+const moment = require('moment-timezone');
+
 
 exports.nouveauAppel = catchAsync(async (req, res, next) => {
 
-    var test = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
-    let dateTime = coucou().format("YYYY-MM-DD HH:mm:ss");
+    let dateTime = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
     if (req.body.gps_coordonnee.lat && req.body.gps_coordonnee.lng && req.body.numTel) {
-        console.log(dateTime)
-        let date = new Date();
         await Appel.findOneAndDelete({
             numTel: req.body.numTel,
         })
@@ -24,11 +20,7 @@ exports.nouveauAppel = catchAsync(async (req, res, next) => {
         });
 
         res.status(200).json({
-            cuou: dateTime,
             status: "success",
-            date: date,
-            moment: "moment",
-            test: test
         });
     } else {
         return next(new AppError("Vous devriez activer le GPS! S'il vous plait", 401));
