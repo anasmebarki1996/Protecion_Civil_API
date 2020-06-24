@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 var http = require("http").Server(app);
 module.exports = {
-  http
+  http,
 };
 const morgan = require("morgan");
 var bodyParser = require("body-parser");
@@ -19,12 +19,13 @@ const limiter = rateLimit({
   // pour maximiser 100 requetes / heure pour le meme @IP
   max: 100,
   windowMs: 60 * 60 * 1000,
-  message: "Trop de requetes de cette adresse IP, veuillez réessayer dans une heure!",
+  message:
+    "Trop de requetes de cette adresse IP, veuillez réessayer dans une heure!",
 });
 
 var http = require("http").Server(app);
 module.exports = {
-  http
+  http,
 };
 
 // app.use("/API", limiter);
@@ -63,6 +64,7 @@ if ((process.env.NODE_ENV = "developement")) {
   app.use(morgan("dev"));
 }
 
+
 // Serving static file from public
 app.use(express.static("public"));
 
@@ -74,7 +76,6 @@ app.use(
 );
 app.use(bodyParser.json());
 //fin partie bodyParser
-
 
 // data sanitization agaist NoSQL query injection
 app.use(mongoSanitize());
@@ -108,7 +109,7 @@ app.use("/API/", teamRoutes);
 app.use("/API/", uniteRoutes);
 app.use("/API/", enginRoutes);
 app.use("/API/", hospitalRoutes);
-app.use(require('./socket.js').router);
+app.use(require("./socket.js").router);
 const io = require("./socket.js").io;
 
 app.all("*", (req, res, next) => {
@@ -126,7 +127,6 @@ const server = http.listen(PORT, "0.0.0.0", function () {
 // const server = http.listen(PORT, process.env.LOCALHOST, function () {
 //   console.log("Server is running on : " + process.env.LOCALHOST + ":" + PORT);
 // });
-
 
 process.on("unhandledRejection", (err) => {
   console.log(err.name, err.message);

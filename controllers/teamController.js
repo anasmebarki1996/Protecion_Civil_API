@@ -7,6 +7,8 @@ const APIFeatures = require("../utils/apiFeatures");
 const moment = require("../utils/moment").moment;
 const dateTime = require("../utils/moment").dateTime;
 const date = require("../utils/moment").date;
+const io = require("../socket").io;
+
 const {
   Types: {
     ObjectId
@@ -233,6 +235,8 @@ exports.setAdresseTeam = catchAsync(async (req, res, next) => {
       }
     }
   );
+
+  io.emit("nouvelleAdresseTeam", id_team);
 
 
 

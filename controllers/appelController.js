@@ -9,7 +9,7 @@ exports.nouveauAppel = catchAsync(async (req, res, next) => {
 
     if (req.body.gps_coordonnee.lat && req.body.gps_coordonnee.lng && req.body.numTel) {
 
-        await Appel.findByIdAndDelete({
+        await Appel.findAndDelete({
             numTel: req.body.numTel,
         })
         await Appel.create({
@@ -50,11 +50,4 @@ exports.getAppel = catchAsync(async (req, res, next) => {
 
     } else
         return next(new AppError("Ce numéro n'utilise pas l'application", 404));
-});
-
-console.log("addDateTimeDepart à faire")
-
-exports.addDateTimeDepart = catchAsync(async (req, res) => {
-
-
 });
