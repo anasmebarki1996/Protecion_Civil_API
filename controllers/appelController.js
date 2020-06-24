@@ -18,7 +18,6 @@ exports.nouveauAppel = catchAsync(async (req, res, next) => {
                 lat: req.body.gps_coordonnee.lat,
                 lng: req.body.gps_coordonnee.lng
             },
-            dateTimeAppel: dateTime
         });
 
         res.status(200).json({
