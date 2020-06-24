@@ -25,7 +25,7 @@ const hospitalSchema = new mongoose.Schema({
         type: Date,
     },
 });
-appelSchema.pre("save", async function (next) {
+hospitalSchema.pre("save", async function (next) {
     this.dateTimeAppel = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
     next();
 });
