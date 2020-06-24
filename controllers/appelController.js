@@ -2,13 +2,14 @@ const Appel = require("../models/appelModel");
 const Intervention = require("../models/interventionModel");
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-const dateTime = require("../utils/moment").dateTime;
+let dateTime = require("../utils/moment").dateTime;
 const moment = require("../utils/moment").moment;
 
 exports.nouveauAppel = catchAsync(async (req, res, next) => {
 
     if (req.body.gps_coordonnee.lat && req.body.gps_coordonnee.lng && req.body.numTel) {
         console.log(dateTime)
+        let date = new Date();
         await Appel.findOneAndDelete({
             numTel: req.body.numTel,
         })
@@ -22,7 +23,9 @@ exports.nouveauAppel = catchAsync(async (req, res, next) => {
 
         res.status(200).json({
             status: "success",
-            dateTime
+            dateTime,
+            date,
+            moment
         });
     } else {
         return next(new AppError("Vous devriez activer le GPS! S'il vous plait", 401));
