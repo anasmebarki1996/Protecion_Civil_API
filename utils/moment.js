@@ -69,11 +69,12 @@ moment.locale('fr');
 var time = moment().tz("Africa/Algiers").format("HH:mm:ss");
 var dateTime = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
 var date = moment().tz("Africa/Algiers").format("YYYY-MM-DD");
-
+var coucou = moment().tz("Africa/Algiers");
 
 module.exports = {
     moment,
     time,
     dateTime,
-    date
+    date,
+    coucou
 };

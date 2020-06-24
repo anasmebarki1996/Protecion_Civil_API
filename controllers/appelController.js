@@ -3,12 +3,12 @@ const Intervention = require("../models/interventionModel");
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 var moment = require('moment-timezone');
-
+let coucou = require("../utils/moment").coucou;
 
 exports.nouveauAppel = catchAsync(async (req, res, next) => {
 
     var test = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
-    let dateTime = require("../utils/moment").dateTime;
+    let dateTime = coucou().format("YYYY-MM-DD HH:mm:ss");
     if (req.body.gps_coordonnee.lat && req.body.gps_coordonnee.lng && req.body.numTel) {
         console.log(dateTime)
         let date = new Date();
@@ -27,7 +27,7 @@ exports.nouveauAppel = catchAsync(async (req, res, next) => {
             cuou: dateTime,
             status: "success",
             date: date,
-            momessssnt: "moment",
+            moment: "moment",
             test: test
         });
     } else {
