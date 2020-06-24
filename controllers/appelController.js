@@ -3,11 +3,11 @@ const Intervention = require("../models/interventionModel");
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 let dateTime = require("../utils/moment").dateTime;
-var moment = require('moment-timezone');
-var test = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
+
 
 exports.nouveauAppel = catchAsync(async (req, res, next) => {
-
+    var moment = require('moment-timezone');
+    var test = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
     if (req.body.gps_coordonnee.lat && req.body.gps_coordonnee.lng && req.body.numTel) {
         console.log(dateTime)
         let date = new Date();
