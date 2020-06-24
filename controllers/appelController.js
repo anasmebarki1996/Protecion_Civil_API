@@ -8,7 +8,7 @@ const moment = require("../utils/moment").moment;
 exports.nouveauAppel = catchAsync(async (req, res, next) => {
 
     if (req.body.gps_coordonnee.lat && req.body.gps_coordonnee.lng && req.body.numTel) {
-
+        console.log(dateTime)
         await Appel.findOneAndDelete({
             numTel: req.body.numTel,
         })
