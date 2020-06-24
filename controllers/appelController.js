@@ -2,11 +2,11 @@ const Appel = require("../models/appelModel");
 const Intervention = require("../models/interventionModel");
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-
+var moment = require('moment-timezone');
 
 
 exports.nouveauAppel = catchAsync(async (req, res, next) => {
-    var moment = require('moment-timezone');
+
     var test = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
     let dateTime = require("../utils/moment").dateTime;
     if (req.body.gps_coordonnee.lat && req.body.gps_coordonnee.lng && req.body.numTel) {
@@ -27,7 +27,7 @@ exports.nouveauAppel = catchAsync(async (req, res, next) => {
             cuou: dateTime,
             status: "success",
             date: date,
-            moment: "moment",
+            momessssnt: "moment",
             test: test
         });
     } else {
