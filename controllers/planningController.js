@@ -222,7 +222,6 @@ exports.addTeam = catchAsync(async (req, res, next) => {
 
   // verifier si la date entrée est une nouvelle date si oui on ajoute la nouvelle date
   // sinon on ajoute directement a la date entrée qui est existe déja
-  console.log(req.body)
   let dateVerify = await Planning.findOne({
     id_unite: req.agent.id_unite,
     "calendrier.date": new Date(req.body.date),

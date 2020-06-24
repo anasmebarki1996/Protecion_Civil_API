@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const dateTime = require("../utils/moment").dateTime;
+const moment = require('moment-timezone');
 
 const interventionSchema = new mongoose.Schema({
   numTel: {
@@ -65,7 +65,6 @@ const interventionSchema = new mongoose.Schema({
   // dateTimeAppel == l'heure de l'appel entrant
   dateTimeAppel: {
     type: Date,
-    default: dateTime,
   },
   // dateTimeDepart == l'heure du départ de l'engin'
   dateTimeDepart: {
@@ -111,6 +110,10 @@ const interventionSchema = new mongoose.Schema({
   },
 });
 
+interventionSchema.pre("save", async function (next) {
+  this.dateTimeAppel = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
+  next();
+});
 const Intervention = mongoose.model("Intervention", interventionSchema);
 
 module.exports = Intervention;

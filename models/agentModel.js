@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const dateTime = require("../utils/moment").dateTime;
+const moment = require('moment-timezone');
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 
@@ -41,8 +41,7 @@ const agentSchema = new mongoose.Schema({
       validator: function (el) {
         return validator.isAlphanumeric(el);
       },
-      message:
-        "le nom d'utilisateur ne peut avoir que les caractères a-z,A-Z,0-9.",
+      message: "le nom d'utilisateur ne peut avoir que les caractères a-z,A-Z,0-9.",
     },
   },
   numTel: {
@@ -60,8 +59,7 @@ const agentSchema = new mongoose.Schema({
           /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,}$/
         );
       },
-      message:
-        "Le mot de passe doit avoir au minimum un maj et un min et num et un spécial caractere",
+      message: "Le mot de passe doit avoir au minimum un maj et un min et num et un spécial caractere",
     },
     select: false,
   },
@@ -89,7 +87,6 @@ const agentSchema = new mongoose.Schema({
   },
   created_at: {
     type: Date,
-    default: dateTime,
   },
   passwordChangedAt: {
     type: Date,
@@ -97,6 +94,7 @@ const agentSchema = new mongoose.Schema({
 });
 
 agentSchema.pre("save", async function (next) {
+  this.created_at = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 12);
   this.passwordConfirm = undefined;

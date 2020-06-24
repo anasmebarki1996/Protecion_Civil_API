@@ -5,8 +5,6 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const APIFeatures = require("../utils/apiFeatures");
 const moment = require("../utils/moment").moment;
-const dateTime = require("../utils/moment").dateTime;
-const date = require("../utils/moment").date;
 const io = require("../socket").io;
 
 const {
@@ -149,6 +147,7 @@ exports.getTeam = catchAsync(async (req, res, next) => {
 });
 
 exports.getAdresseAllTeams = catchAsync(async (req, res, next) => {
+  let date = moment().tz("Africa/Algiers").format("YYYY-MM-DD");
   const teams = await Planning.aggregate([{
       $unwind: "$calendrier",
     },
@@ -178,6 +177,7 @@ exports.getAdresseAllTeams = catchAsync(async (req, res, next) => {
 });
 
 exports.getAdresseTeam = catchAsync(async (req, res, next) => {
+  let date = moment().tz("Africa/Algiers").format("YYYY-MM-DD");
   const team = await Planning.aggregate([{
       $unwind: "$calendrier",
     },
@@ -206,7 +206,7 @@ exports.getAdresseTeam = catchAsync(async (req, res, next) => {
 });
 
 exports.setAdresseTeam = catchAsync(async (req, res, next) => {
-
+  let dateTime = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
   const id_team = await getTeamId(req.agent);
   if (id_team == null) {
     return next(
@@ -258,8 +258,7 @@ exports.getTeamID = catchAsync(async (req, res, next) => {
 
 // pour avoir la liste des equipes disponible pour leur envoyer les interventions
 exports.getTeamsDisponible = catchAsync(async (req, res, next) => {
-  console.log(req.agent.id_unite)
-  console.log(req.body)
+  let date = moment().tz("Africa/Algiers").format("YYYY-MM-DD");
   const teams = await Planning.aggregate([{
       $unwind: "$calendrier",
     },
@@ -365,7 +364,8 @@ exports.getTeamsDisponible = catchAsync(async (req, res, next) => {
 
 
 var getTeamId = async function (agent) {
-
+  let dateTime = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
+  let date = moment().tz("Africa/Algiers").format("YYYY-MM-DD");
   var start = new Date(dateTime);
   start.setHours(0);
   start.setMinutes(0);

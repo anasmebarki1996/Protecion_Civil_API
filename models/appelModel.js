@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const dateTime = require("../utils/moment").dateTime;
+const moment = require('moment-timezone');
 
 const appelSchema = new mongoose.Schema({
     numTel: {
@@ -18,12 +18,15 @@ const appelSchema = new mongoose.Schema({
     },
     dateTimeAppel: {
         type: Date,
-        default: dateTime,
+
     },
 
 });
 
-
+appelSchema.pre("save", async function (next) {
+    this.dateTimeAppel = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
+    next();
+});
 
 
 const Appel = mongoose.model("Appel", appelSchema);

@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
-const dateTime = require("../utils/moment").dateTime;
+const moment = require('moment-timezone');
 
 const hospitalSchema = new mongoose.Schema({
     name: {
         type: String,
-        unique:true
+        unique: true
     },
     gps_coordonnee: {
         lat: {
@@ -19,14 +19,16 @@ const hospitalSchema = new mongoose.Schema({
     numTel: {
         type: String,
         required: [true, "Vous devez saisir un numéro telephone"],
-        unique:true
+        unique: true
     },
     created_at: {
         type: Date,
-        default: dateTime
     },
 });
-
+appelSchema.pre("save", async function (next) {
+    this.dateTimeAppel = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
+    next();
+});
 
 const Hospital = mongoose.model("Hospital", hospitalSchema);
 

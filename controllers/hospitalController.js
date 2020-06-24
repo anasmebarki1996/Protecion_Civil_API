@@ -1,5 +1,5 @@
 const Hopital = require("../models/hospitalModel");
-const dateTime = require("../utils/moment").dateTime;
+const moment = require('moment-timezone');
 const catchAsync = require('../utils/catchAsync');
 const APIFeatures = require('../utils/apiFeatures');
 const AppError = require('../utils/appError');
@@ -34,7 +34,7 @@ exports.getHospital = catchAsync(async (req, res, next) => {
 
 
 exports.createHospital = catchAsync(async (req, res, next) => {
-    // const hospital = await Hopital.create({
+    let dateTime = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
     await Hopital.create({
         name: req.body.name,
         gps_coordonnee: {
@@ -44,11 +44,6 @@ exports.createHospital = catchAsync(async (req, res, next) => {
         numTel: req.body.numTel,
         created_at: dateTime
     });
-
-    // if (!hospital) {
-    //     return next(new AppError("l'hopital avec cette id n'existe pas.", 404));
-    // }
-    // res.status(200).json(hospital)
     res.status(200).json()
 });
 
