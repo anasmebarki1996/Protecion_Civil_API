@@ -15,6 +15,7 @@ const {
 
 
 exports.getTeam = catchAsync(async (req, res, next) => {
+  if (req.unite.type == "principale") req.unite.query_unite['$in'].push(ObjectId(req.unite._id))
   const team = await Planning.aggregate([{
       $unwind: "$calendrier",
     },
@@ -23,7 +24,8 @@ exports.getTeam = catchAsync(async (req, res, next) => {
     },
     {
       $match: {
-        id_unite: ObjectId(req.agent.id_unite),
+        // id_unite: ObjectId(req.agent.id_unite),
+        id_unite: req.unite.query_unite,
         "calendrier.team._id": ObjectId(req.body.id_team),
       },
     },
@@ -186,7 +188,8 @@ exports.getAdresseTeam = catchAsync(async (req, res, next) => {
     },
     {
       $match: {
-        id_unite: ObjectId(req.agent.id_unite),
+        // id_unite: ObjectId(req.agent.id_unite),
+        id_unite: req.unite.query_unite,
         "calendrier.date": new Date(date),
         "calendrier.team._id": ObjectId(req.body.id_team)
       },
@@ -424,9 +427,6 @@ exports.getTeamAndroid = catchAsync(async (req, res, next) => {
   const team_id = req.params.id || await getTeamId(req.agent)
 
   console.log(team_id);
-
-
-
 
   const team = await Planning.aggregate([{
       $unwind: "$calendrier",

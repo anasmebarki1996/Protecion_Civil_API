@@ -6,7 +6,6 @@ const moment = require('moment-timezone');
 
 exports.nouveauAppel = catchAsync(async (req, res, next) => {
 
-    let dateTime = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
     if (req.body.gps_coordonnee.lat && req.body.gps_coordonnee.lng && req.body.numTel) {
         await Appel.findOneAndDelete({
             numTel: req.body.numTel,
