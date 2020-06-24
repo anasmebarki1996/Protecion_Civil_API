@@ -352,6 +352,11 @@ exports.getTeamsDisponible = catchAsync(async (req, res, next) => {
         "engin.panne": false
       },
     },
+    {
+      $match: {
+        "disponibilite": true
+      },
+    },
     // {
     //   $project: {
     //     _id: 0,
@@ -367,9 +372,6 @@ exports.getTeamsDisponible = catchAsync(async (req, res, next) => {
     teams,
   });
 });
-
-
-
 
 var getTeamId = async function (agent) {
   let dateTime = moment().tz("Africa/Algiers").format("YYYY-MM-DD HH:mm:ss");
@@ -425,7 +427,6 @@ var getTeamId = async function (agent) {
   else
     return id_team[0]._id
 }
-
 
 exports.getTeamAndroid = catchAsync(async (req, res, next) => {
 

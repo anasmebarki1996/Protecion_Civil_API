@@ -3,14 +3,12 @@ const Planning = require("./../models/planningModel");
 const Appel = require("./../models/appelModel");
 const Unite = require("./../models/uniteModel");
 const catchAsync = require("../utils/catchAsync");
-const moment = require('moment-timezone');
+const moment = require("moment-timezone");
 const APIFeatures = require("../utils/apiFeatures");
 const AppError = require("../utils/appError");
 const io = require("../socket").io;
 const {
-  Types: {
-    ObjectId
-  },
+  Types: { ObjectId },
 } = (mongoose = require("mongoose"));
 
 exports.getAllIntervention = catchAsync(async (req, res, next) => {
@@ -40,7 +38,8 @@ exports.getAllIntervention = catchAsync(async (req, res, next) => {
   });
 
   interventions = interventions.where({
-    $or: [{
+    $or: [
+      {
         id_unite: req.unite.query_unite,
       },
       {
@@ -70,7 +69,8 @@ exports.getAllIntervention = catchAsync(async (req, res, next) => {
 exports.getAllIntervention_name = catchAsync(async (req, res) => {
   // EXECUTE QUERY
 
-  const interventions = await Intervention.aggregate([{
+  const interventions = await Intervention.aggregate([
+    {
       $project: {
         _id: 0,
         id_node: 1,
@@ -93,7 +93,8 @@ exports.getAllIntervention_name = catchAsync(async (req, res) => {
         let: {
           id_node: "$id_node",
         },
-        pipeline: [{
+        pipeline: [
+          {
             $match: {
               $expr: {
                 $eq: ["$_id", "$$id_node"],
@@ -171,7 +172,6 @@ exports.getIntervention = catchAsync(async (req, res, next) => {
   });
 });
 
-
 exports.getAllIntervention_Envoye = catchAsync(async (req, res) => {
   // EXECUTE QUERY
   let features,
@@ -224,7 +224,8 @@ exports.getAllIntervention_EnCours = catchAsync(async (req, res) => {
   });
 
   interventions = interventions.where({
-    $or: [{
+    $or: [
+      {
         id_unite: req.unite.query_unite,
       },
       {
@@ -309,15 +310,18 @@ exports.envoyerIntervention = catchAsync(async (req, res, next) => {
 });
 
 exports.envoyerInterventionAuChef = catchAsync(async (req, res, next) => {
-  const intervention = await Intervention.findOneAndUpdate({
-    _id: req.body.id_intervention,
-    id_unite: req.agent.id_unite,
-    statut: "envoye",
-  }, {
-    cco_agent_secondaire: req.agent._id,
-    id_team: req.body.id_team,
-    statut: "recu",
-  });
+  const intervention = await Intervention.findOneAndUpdate(
+    {
+      _id: req.body.id_intervention,
+      id_unite: req.agent.id_unite,
+      statut: "envoye",
+    },
+    {
+      cco_agent_secondaire: req.agent._id,
+      id_team: req.body.id_team,
+      statut: "recu",
+    }
+  );
   if (!intervention) {
     return next(
       new AppError(
@@ -326,7 +330,31 @@ exports.envoyerInterventionAuChef = catchAsync(async (req, res, next) => {
       )
     );
   }
-
+  await Planning.findOneAndUpdate(
+    {
+      id_unite: ObjectId(req.agent.id_unite),
+      "calendrier.team._id": ObjectId(req.body.id_team),
+    },
+    {
+      $set: {
+        "calendrier.$[].team.$[a].disponibilite": false,
+      },
+    },
+    {
+      arrayFilters: [
+        {
+          "a._id": ObjectId(req.body.id_team),
+        },
+      ],
+    },
+    (err, doc) => {
+      if (err || !doc) {
+        return next(
+          new AppError("Il y a un erreur veuillez acctualiser la page", 403)
+        );
+      }
+    }
+  );
   io.emit("interventionStart", req.body.id_team, req.body.id_intervention);
 
   let unites = [];
@@ -350,8 +378,9 @@ exports.envoyerInterventionAuChef = catchAsync(async (req, res, next) => {
 });
 
 exports.getIntervention_details = catchAsync(async (req, res, next) => {
-  console.log(req.body)
-  let intervention = await Intervention.aggregate([{
+  console.log(req.body);
+  let intervention = await Intervention.aggregate([
+    {
       $match: {
         _id: ObjectId(req.body.id_intervention),
       },
@@ -362,13 +391,15 @@ exports.getIntervention_details = catchAsync(async (req, res, next) => {
         let: {
           id_unite: "$id_unite",
         },
-        pipeline: [{
-          $match: {
-            $expr: {
-              $eq: ["$_id", "$$id_unite"],
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$_id", "$$id_unite"],
+              },
             },
           },
-        }, ],
+        ],
         as: "unite_secondaire",
       },
     },
@@ -381,13 +412,15 @@ exports.getIntervention_details = catchAsync(async (req, res, next) => {
         let: {
           id_unite: "$id_unite_principale",
         },
-        pipeline: [{
-          $match: {
-            $expr: {
-              $eq: ["$_id", "$$id_unite"],
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$_id", "$$id_unite"],
+              },
             },
           },
-        }, ],
+        ],
         as: "unite_principale",
       },
     },
@@ -400,7 +433,8 @@ exports.getIntervention_details = catchAsync(async (req, res, next) => {
         let: {
           id_agent: "$cco_agent_principale",
         },
-        pipeline: [{
+        pipeline: [
+          {
             $match: {
               $expr: {
                 $eq: ["$_id", "$$id_agent"],
@@ -427,7 +461,8 @@ exports.getIntervention_details = catchAsync(async (req, res, next) => {
         let: {
           id_agent: "$cco_agent_secondaire",
         },
-        pipeline: [{
+        pipeline: [
+          {
             $match: {
               $expr: {
                 $eq: ["$_id", "$$id_agent"],
@@ -454,19 +489,22 @@ exports.getIntervention_details = catchAsync(async (req, res, next) => {
         let: {
           id_hospital: "$transfere.hospital",
         },
-        pipeline: [{
-          $match: {
-            $expr: {
-              $eq: ["$_id", "$$id_hospital"],
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$_id", "$$id_hospital"],
+              },
             },
           },
-        }, ],
+        ],
         as: "transfere",
       },
     },
   ]);
 
-  const team = await Planning.aggregate([{
+  const team = await Planning.aggregate([
+    {
       $unwind: "$calendrier",
     },
     {
@@ -493,7 +531,8 @@ exports.getIntervention_details = catchAsync(async (req, res, next) => {
         let: {
           agent: "$team.agents.agent",
         },
-        pipeline: [{
+        pipeline: [
+          {
             $match: {
               $expr: {
                 $eq: ["$_id", "$$agent"],
@@ -532,7 +571,8 @@ exports.getIntervention_details = catchAsync(async (req, res, next) => {
         let: {
           engin: "$team.engin",
         },
-        pipeline: [{
+        pipeline: [
+          {
             $match: {
               $expr: {
                 $eq: ["$_id", "$$engin"],
@@ -579,7 +619,7 @@ exports.getIntervention_details = catchAsync(async (req, res, next) => {
     },
   ]);
 
-  console.log(team)
+  console.log(team);
 
   res.status(200).json({
     status: "success",
@@ -607,11 +647,14 @@ exports.getInterventionByChef = catchAsync(async (req, res, next) => {
 exports.updateInterventionStatus = catchAsync(async (req, res, next) => {
   const id_intervention = req.params.id_intervention;
 
-  await Intervention.findOneAndUpdate({
-    _id: id_intervention,
-  }, {
-    statut: req.body.statut,
-  });
+  await Intervention.findOneAndUpdate(
+    {
+      _id: id_intervention,
+    },
+    {
+      statut: req.body.statut,
+    }
+  );
 
   const intervention = await Intervention.findOne({
     _id: id_intervention,
@@ -635,7 +678,8 @@ exports.updateInterventionByChef = catchAsync(async (req, res, next) => {
     req.body.transfere.dateTimeDepart = dateTime;
   else if (req.body.dateTimeFin == "now()") req.body.dateTimeFin = dateTime;
 
-  await Intervention.findOneAndUpdate({
+  await Intervention.findOneAndUpdate(
+    {
       _id: id_intervention,
     },
     req.body
@@ -656,6 +700,34 @@ exports.updateInterventionByChef = catchAsync(async (req, res, next) => {
   });
   if (unite.unite_principale != intervention.id_unite_principale) {
     unites.push(unite.unite_principale);
+  }
+
+  if (req.body.statut == "termine" || req.body.statut == "annule") {
+    await Planning.findOneAndUpdate(
+      {
+        id_unite: ObjectId(req.agent.id_unite),
+        "calendrier.team._id": ObjectId(req.body.id_team),
+      },
+      {
+        $set: {
+          "calendrier.$[].team.$[a].disponibilite": true,
+        },
+      },
+      {
+        arrayFilters: [
+          {
+            "a._id": ObjectId(req.body.id_team),
+          },
+        ],
+      },
+      (err, doc) => {
+        if (err || !doc) {
+          return next(
+            new AppError("Il y a un erreur veuillez acctualiser la page", 403)
+          );
+        }
+      }
+    );
   }
   io.emit("interventionStatusChange", {
     unites: unites,
